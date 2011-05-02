@@ -1,2 +1,6 @@
 .*
+samples/http/db/*
+samples/http/logs/*
+samples/http/tmp/*
+samples/redis/dump.rdb
 !.gitignore
