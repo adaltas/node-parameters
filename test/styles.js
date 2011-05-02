@@ -1,9 +1,5 @@
 var sys = require('sys'),
-	styles = require('./index');
-
-
-sys.print('\x1b[1m\x1b[31mhello\x1b[39m\x1b[22m\n');
-sys.print('\x1b[1m\x1b[31mhello\x1b[39m\x1b[22m toto\n');
+	styles = require('../index').styles;
 
 styles()
 .println('Test default')
@@ -16,4 +12,6 @@ styles()
 // Temporary print green then blue
 .print('Test ').green('gre').green('en').print(' or ').blue('bl').blue('ue').print(' and ').green('green').ln()
 // Definitely pass to bold
-.print('Test ').green().print('gre').print('en').nocolor(' or ').blue().print('bl').print('ue').nocolor(' and ').green().print('gre').print('en').ln();
+.print('Test ').green().print('gre').print('en').nocolor(' or ').blue().print('bl').print('ue').nocolor(' and ').green().print('gre').print('en').ln()
+
+.reset();

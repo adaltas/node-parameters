@@ -1,7 +1,10 @@
 
 module.exports = {
+	// Core
 	Shell: require('./lib/Shell'),
-	history: require('./lib/history'),
-	styles: require('./lib/styles')
+	styles: require('./lib/styles'),
+	// Plugins
+	completer: require('./lib/completer'),
+	history: require('./lib/history')
 };
 
