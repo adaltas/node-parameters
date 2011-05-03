@@ -8,6 +8,7 @@
 	app.configure(function(){
 		app.use( shell.history({shell: app}) );
 		app.use( shell.completer({shell: app}) );
+		app.use( shell.help({shell: app, introduction: true}) );
 	});
 	
 	app.on('exit', function(){

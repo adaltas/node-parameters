@@ -1,6 +1,6 @@
 { "name": "shell"
 , "version": "0.0.1"
-, "description": "Framework for console based application"
+, "description": "Build console based applications"
 , "author": "David Worms <david@adaltas.com>"
 , "contributors":
   [ { "name": "David Worms", "email": "david@adaltas.com" } ]

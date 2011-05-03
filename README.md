@@ -1,4 +1,4 @@
-# Shell - Framework for console based application
+# Shell - Build console based applications
 
 Create nice looking shell applications in minutes with a Connect inspired API.
 
@@ -12,6 +12,7 @@ Create nice looking shell applications in minutes with a Connect inspired API.
 	app.configure(function(){
 		app.use( shell.history({shell: app}) );
 		app.use( shell.completer({shell: app}) );
+		app.use( shell.help({shell: app, introduction: true}) );
 	});
 	
 	app.on('exit', function(){
@@ -42,21 +43,30 @@ Create nice looking shell applications in minutes with a Connect inspired API.
 	app.configure(function(){
 		app.use( shell.history({shell: app}) );
 		app.use( shell.completer({shell: app}) );
+		app.use( shell.help({shell: app, introduction: true}) );
 	});
 
 The constructor `shell.Shell` take an optional object. options are
-*	stdin	Source to read from
-*	stdout	Destination to write to
+-	*stdin*, Source to read from
+-	*stdout*, Destination to write to
 
 Like with Express, `app.configure` allows the customization of plugins for different environments (however, it is not yet implemented) while `app.use` register plugins.
 
 ## History plugin
 
 Persist command history between multiple sessions. Options passed during creation are:
-*	shell (required)
-*	historyFile, default to `process.cwd()+'/.node_shell'`
+-	*shell*, required
+-	*historyFile*, default to `process.cwd()+'/.node_shell'`
 
 ## Completer plugin
 
 Provide tab completion. Options passed during creation are:
-*	shell (required)
+-	*shell*, required
+
+## Help plugin
+
+Display help when use type "help" or when he press `enter` on empty prompt. Command help is only displayed if a description was provided during the command registration. Additionnaly, a new `shell.help()` function is made available. Options passed during creation are:
+-	*shell*, required
+-	*introduction*, Print message 'Type "help" or press enter for a list of commands' if boolean true or a custom message if a string
+
+
