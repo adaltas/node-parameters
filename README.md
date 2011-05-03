@@ -1,4 +1,4 @@
-# Shell - Build console based applications
+# Shell - Full features and pretty console applications
 
 Create nice looking shell applications in minutes with a Connect inspired API.
 
@@ -35,6 +35,10 @@ Create nice looking shell applications in minutes with a Connect inspired API.
 			next();
 		});
 	});
+
+## Installation
+
+	`npm install shell`
 
 ## Creating and configuring
 
