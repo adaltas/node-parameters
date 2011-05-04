@@ -3,8 +3,7 @@
 	var fs = require('fs'),
 		exec = require('child_process').exec,
 		spawn = require('child_process').spawn,
-		shell = require('shell'),
-		styles = shell.styles();
+		shell = require('shell');
 	
 	// App
 	var app = new shell.Shell();
@@ -21,7 +20,7 @@
 	// Runtime & exit
 	var redis, server;
 	
-	app.cmd('install', 'Install node modules', function(answer, next){
+	app.cmd('install', 'Install node modules', function(req, res, next){
 		var cmds = [
 			'npm install express',
 			'npm install cluster',
@@ -30,22 +29,22 @@
 		exec(cmds.join(' && '))
 		.on('exit', function(code){
 			if(code === 0){
-				styles.cyan('Module successfully installed');
+				res.cyan('Module successfully installed');
 			}else{
-				styles.red('Error while installing modules');
+				res.red('Error while installing modules');
 			}
 			next();
 		});
 	});
 	
 	// Commands
-	app.cmd('redis start', 'Start the redis database', function(answer, next){
+	app.cmd('redis start', 'Start the redis database', function(req, res, next){
 		redis = spawn('redis-server', [__dirname+'/redis.conf']);
 		redis.stdout.pipe(fs.createWriteStream(__dirname+'/logs/redis.out.log'));
 		redis.stderr.pipe(fs.createWriteStream(__dirname+'/logs/redis.err.log'));
 		redis.on('exit', function(code){
 			if(code !== 0){
-				styles.red('Redis exit with code '+code);
+				res.red('Redis exit with code '+code);
 				redis = null;
 			}
 		});
@@ -54,42 +53,42 @@
 		},500);
 	});
 	
-	app.cmd('redis stop', 'Stop the redis database', function(answer, next){
+	app.cmd('redis stop', 'Stop the redis database', function(req, res, next){
 		if(!redis){
-			return styles.red('Redis not started'), next();
+			return res.red('Redis not started'), next();
 		}
 		redis.on('exit', function(code){
 			if (code === 0) {
-				styles.cyan('Redis quit successfully');
+				res.cyan('Redis quit successfully');
 			}
 			next();
 		});
 		redis.kill();
 	});
 	
-	app.cmd('server start', 'Start the HTTP server', function(answer, next){
+	app.cmd('server start', 'Start the HTTP server', function(req, res, next){
 		if(!redis){
-			return styles.red('Redis not started'), next();
+			return res.red('Redis not started'), next();
 		}
 		server = spawn('node', [__dirname+'/lib/server']);
 		server.stdout.pipe(fs.createWriteStream(__dirname+'/logs/server.out.log'));
 		server.stderr.pipe(fs.createWriteStream(__dirname+'/logs/server.err.log'));
 		server.on('exit', function(code){
 			if(code !== 0){
-				styles.red('Server exit with code '+code);
+				res.red('Server exit with code '+code);
 				server = null;
 			}
 		})
 		next();
 	});
 	
-	app.cmd('server stop', 'Stop the HTTP server', function(answer, next){
+	app.cmd('server stop', 'Stop the HTTP server', function(req, res, next){
 		if(!server){
-			return styles.red('Server not started'), next();
+			return res.red('Server not started'), next();
 		}
 		server.on('exit', function(code){
 			if (code === 0) {
-				styles.cyan('Server quit successfully');
+				res.cyan('Server quit successfully');
 			}
 			next();
 		});

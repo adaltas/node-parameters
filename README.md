@@ -20,18 +20,18 @@ Create nice looking shell applications in minutes with a Connect inspired API.
 		if(app.client){ app.client.quit(); }
 	});
 	
-	app.cmd('start', 'Start the redis server', function(params, next){
+	app.cmd('start', 'Start the redis server', function(req, next){
 		app.server = spawn('redis-server', [__dirname+'/redis.conf']);
 		next();
 	});
 	
-	app.cmd('keys :pattern', 'Find keys', function(params, next){
+	app.cmd('keys :pattern', 'Find keys', function(req, next){
 		if(!app.client){
 			app.client = require('redis').createClient();
 		}
-		app.client.keys(params.pattern, function(err, keys){
+		app.client.keys(req.params.pattern, function(err, keys){
 			if(err){ return style.red(err.message), next(); }
-			styles.cyan(keys.join('\n'));
+			styles.cyan(keys.join('\n')||'no keys');
 			next();
 		});
 	});
@@ -55,6 +55,18 @@ The constructor `shell.Shell` take an optional object. options are
 -	*stdout*, Destination to write to
 
 Like with Express, `app.configure` allows the customization of plugins for different environments (however, it is not yet implemented) while `app.use` register plugins.
+
+## Routes
+
+A route is made of a command pattern, an optional description and one or more route specific middleware.
+
+Middlewares recieve three parameters, a request object, a response object and a function.
+
+The request object contains the following properties:
+-	*command*, command entered by the user
+-	*params*, parameters object extracted from the command
+
+The response object inherit from styles which contains various utility functions for printing, coloring and bolding.
 
 ## History plugin
 
