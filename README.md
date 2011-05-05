@@ -6,8 +6,7 @@ Create nice looking shell applications in minutes with a Connect inspired API.
 
     var spawn = require('child_process').spawn,
     	shell = require('shell'),
-    	app = new shell.Shell(),
-    	styles = app.styles;
+    	app = new shell.Shell();
     
 	app.configure(function(){
 		app.use( shell.history({shell: app}) );
@@ -20,18 +19,18 @@ Create nice looking shell applications in minutes with a Connect inspired API.
 		if(app.client){ app.client.quit(); }
 	});
 	
-	app.cmd('start', 'Start the redis server', function(req, next){
+	app.cmd('start', 'Start the redis server', function(req, res, next){
 		app.server = spawn('redis-server', [__dirname+'/redis.conf']);
 		next();
 	});
 	
-	app.cmd('keys :pattern', 'Find keys', function(req, next){
+	app.cmd('keys :pattern', 'Find keys', function(req, res, next){
 		if(!app.client){
 			app.client = require('redis').createClient();
 		}
 		app.client.keys(req.params.pattern, function(err, keys){
-			if(err){ return style.red(err.message), next(); }
-			styles.cyan(keys.join('\n')||'no keys');
+			if(err){ return res.styles.red(err.message), next(); }
+			res.cyan(keys.join('\n')||'no keys');
 			next();
 		});
 	});
