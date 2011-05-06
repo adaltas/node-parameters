@@ -6,6 +6,8 @@ module.exports = {
 	// Plugins
 	completer: require('./lib/completer'),
 	help: require('./lib/help'),
-	history: require('./lib/history')
+	history: require('./lib/history'),
+	router: require('./lib/router'),
+	error: require('./lib/error')
 };
 

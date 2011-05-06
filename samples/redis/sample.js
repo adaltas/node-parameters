@@ -7,7 +7,9 @@
 	app.configure(function(){
 		app.use( shell.history({shell: app}) );
 		app.use( shell.completer({shell: app}) );
+		app.use( shell.router({shell: app}) );
 		app.use( shell.help({shell: app, introduction: true}) );
+		app.use( shell.error({shell: app}) );
 	});
 	
 	app.on('exit', function(){
@@ -17,7 +19,7 @@
 	
 	app.cmd('start', 'Start the redis server', function(req, res, next){
 		app.server = spawn('redis-server', [__dirname+'/redis.conf']);
-		next();
+		res.prompt();
 	});
 	
 	app.cmd('keys :pattern', 'Find keys', function(req, res, next){
@@ -27,6 +29,6 @@
 		app.client.keys(req.params.pattern, function(err, keys){
 			if(err){ return res.styles.red(err.message), next(); }
 			res.cyan(keys.join('\n')||'no keys');
-			next();
+			res.prompt();
 		});
 	});
