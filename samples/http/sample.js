@@ -33,7 +33,7 @@
 			}else{
 				res.red('Error while installing modules');
 			}
-			next();
+			res.prompt();
 		});
 	});
 	
@@ -49,26 +49,26 @@
 			}
 		});
 		setTimeout(function(){
-			next();
+			res.prompt();
 		},500);
 	});
 	
 	app.cmd('redis stop', 'Stop the redis database', function(req, res, next){
 		if(!redis){
-			return res.red('Redis not started'), next();
+			return res.red('Redis not started'), res.prompt();
 		}
 		redis.on('exit', function(code){
 			if (code === 0) {
 				res.cyan('Redis quit successfully');
 			}
-			next();
+			res.prompt();
 		});
 		redis.kill();
 	});
 	
 	app.cmd('server start', 'Start the HTTP server', function(req, res, next){
 		if(!redis){
-			return res.red('Redis not started'), next();
+			return res.red('Redis not started'), res.prompt();
 		}
 		server = spawn('node', [__dirname+'/lib/server']);
 		server.stdout.pipe(fs.createWriteStream(__dirname+'/logs/server.out.log'));
@@ -79,18 +79,18 @@
 				server = null;
 			}
 		})
-		next();
+		res.prompt();
 	});
 	
 	app.cmd('server stop', 'Stop the HTTP server', function(req, res, next){
 		if(!server){
-			return res.red('Server not started'), next();
+			return res.red('Server not started'), res.prompt();
 		}
 		server.on('exit', function(code){
 			if (code === 0) {
 				res.cyan('Server quit successfully');
 			}
-			next();
+			res.prompt();
 		});
 		server.kill();
 	});

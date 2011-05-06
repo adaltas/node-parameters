@@ -11,7 +11,9 @@ Create nice looking shell applications in minutes with a Connect inspired API.
 	app.configure(function(){
 		app.use( shell.history({shell: app}) );
 		app.use( shell.completer({shell: app}) );
+		app.use( shell.router({shell: app}) );
 		app.use( shell.help({shell: app, introduction: true}) );
+		app.use( shell.error({shell: app}) );
 	});
 	
 	app.on('exit', function(){
@@ -21,7 +23,7 @@ Create nice looking shell applications in minutes with a Connect inspired API.
 	
 	app.cmd('start', 'Start the redis server', function(req, res, next){
 		app.server = spawn('redis-server', [__dirname+'/redis.conf']);
-		next();
+		res.prompt();
 	});
 	
 	app.cmd('keys :pattern', 'Find keys', function(req, res, next){
@@ -31,7 +33,7 @@ Create nice looking shell applications in minutes with a Connect inspired API.
 		app.client.keys(req.params.pattern, function(err, keys){
 			if(err){ return res.styles.red(err.message), next(); }
 			res.cyan(keys.join('\n')||'no keys');
-			next();
+			res.prompt();
 		});
 	});
 
@@ -55,7 +57,7 @@ The constructor `shell.Shell` take an optional object. options are
 
 Like with Express, `app.configure` allows the customization of plugins for different environments (however, it is not yet implemented) while `app.use` register plugins.
 
-## Routes
+## Routes plugin
 
 A route is made of a command pattern, an optional description and one or more route specific middleware.
 
