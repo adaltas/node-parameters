@@ -1,6 +1,6 @@
 
 var express = require('express'),
-	RedisStore = require('connect-redis');
+  RedisStore = require('connect-redis');
 
 var app = module.exports = express.createServer();
 
@@ -15,5 +15,5 @@ app.configure(function(){
 });
 
 app.get('/', function(req, res, next){
-	res.send('Welcome');
+  res.send('Welcome');
 });

@@ -1,5 +1,5 @@
 var sys = require('sys'),
-	styles = require('../index').styles;
+  styles = require('../index').styles;
 
 styles()
 .println('Test default')
