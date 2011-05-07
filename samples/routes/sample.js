@@ -1,8 +1,7 @@
 #!/usr/bin/env node
 
-  var spawn = require('child_process').spawn,
-      shell = require('shell'),
-      app = new shell.Shell();
+  var shell = require('shell')
+    , app = new shell.Shell();
     
   app.configure(function(){
     app.use( shell.router({shell: app}) );

@@ -1,6 +1,6 @@
 # Shell - Full features and pretty console applications
 
-Create nice looking shell applications in minutes with a Connect inspired API.
+Create nice looking shell applications in minutes with Connect/Express inspired API and functionnalities.
 
 ## Quick exemple, a redis client
 
