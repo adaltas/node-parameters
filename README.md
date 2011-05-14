@@ -57,6 +57,11 @@ The constructor `shell.Shell` take an optional object. options are
 
 Like with Express, `app.configure` allows the customization of plugins for different environments (however, it is not yet implemented) while `app.use` register plugins.
 
+## Shell properties
+
+-	*isShell*, detect wether the command is runned inside a shell are as a single command.
+-	*project_dir*, return the project root directory path or null if node was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
+
 ## Routes plugin
 
 A route is made of a command pattern, an optional description and one or more route specific middleware.
