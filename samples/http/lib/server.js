@@ -1,6 +1,6 @@
 
 var cluster = require('cluster'),
-  app = require('./app');
+    app = require('./app');
 
 cluster(app)
 .set('workers', 1)
