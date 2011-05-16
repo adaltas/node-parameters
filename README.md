@@ -9,11 +9,11 @@ Create nice looking shell applications in minutes with Connect/Express inspired 
     	app = new shell.Shell();
     
 	app.configure(function(){
-		app.use( shell.history({shell: app}) );
-		app.use( shell.completer({shell: app}) );
-		app.use( shell.router({shell: app}) );
-		app.use( shell.help({shell: app, introduction: true}) );
-		app.use( shell.error({shell: app}) );
+		app.use(shell.history({shell: app}));
+		app.use(shell.completer({shell: app}));
+		app.use(shell.router({shell: app}));
+		app.use(shell.help({shell: app, introduction: true}));
+		app.use(shell.error({shell: app}));
 	});
 	
 	app.on('exit', function(){
@@ -44,21 +44,34 @@ Create nice looking shell applications in minutes with Connect/Express inspired 
 ## Creating and configuring
 
 	var app = new shell.Shell();
-	
-	app.configure(function(){
-		app.use( shell.history({shell: app}) );
-		app.use( shell.completer({shell: app}) );
-		app.use( shell.help({shell: app, introduction: true}) );
+	app.configure(function() {
+		app.use(shell.history({shell: app}));
+		app.use(shell.completer({shell: app}));
+		app.use(shell.help({shell: app, introduction: true}));
+	});
+	app.configure('prod', function() {
+		app.set('title', 'Production Mode');
 	});
 
 The constructor `shell.Shell` take an optional object. options are
 -	*stdin*, Source to read from
 -	*stdout*, Destination to write to
 
-Like with Express, `app.configure` allows the customization of plugins for different environments (however, it is not yet implemented) while `app.use` register plugins.
+Like with Express, `app.configure` allows the customization of plugins for all or specific environments while `app.use` register plugins.
 
-## Shell properties
+If `app.configure` is called without specifying the environment as the first argument, the provided callback will always be called. Otherwise, the environment must match the global variable `NODE_ENV` or the `env` setting.
 
+## Shell settings
+
+Shell settings may be set by calling `app.set('key', value)` and may be retrieved by calling the same function without a second argument.
+
+	var app = new shell.Shell();
+	app.set('env', 'prod');
+	app.configure('prod', function() {
+		console.log(app.set('env'));
+	});
+
+-   *env*, the running environment, default to `NODE_ENV` if defined.
 -	*isShell*, detect wether the command is runned inside a shell are as a single command.
 -	*project_dir*, return the project root directory path or null if node was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
 

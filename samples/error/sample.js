@@ -5,9 +5,9 @@
         app = new shell.Shell();
         
     app.configure(function(){
-        app.use( shell.router({shell: app}) );
-        app.use( shell.help({shell: app, introduction: true}) );
-        app.use( shell.error({shell: app}) );
+        app.use(shell.router({shell: app}));
+        app.use(shell.help({shell: app, introduction: true}));
+        app.use(shell.error({shell: app}));
     });
     
     app.on('exit', function(){
