@@ -2,7 +2,8 @@
 
     var shell = require('shell');
     
-    var app = new shell.Shell()
+    var app = new shell.Shell();
+    
     app.configure(function() {
         app.use(shell.history({
             shell: app
@@ -15,7 +16,9 @@
             ip: '0.0.0.0',
             port: '8999',
             stdout: __dirname+'/cloud9.out.log',
-            stderr: __dirname+'/cloud9.err.log'
+            stderr: __dirname+'/cloud9.err.log',
+            pidfile: __dirname+'/cloud9.pid',
+            detach: true
         }));
         app.use(shell.help({
             shell: app,

@@ -6,3 +6,4 @@ samples/redis/dump.rdb
 !.gitignore
 samples/cloud9/cloud9.err.log
 samples/cloud9/cloud9.out.log
+samples/cloud9/cloud9.pid
