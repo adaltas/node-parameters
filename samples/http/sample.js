@@ -5,6 +5,8 @@
         spawn = require('child_process').spawn,
         shell = require('shell');
     
+    process.chdir(__dirname);
+    
     // App
     var app = new shell.Shell();
     app.configure(function(){
