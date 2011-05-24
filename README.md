@@ -4,29 +4,32 @@ Create nice looking shell applications in minutes with Connect/Express inspired 
 
 ## Quick exemple, a redis client
 
-    var spawn = require('child_process').spawn,
-        shell = require('shell'),
-        app = new shell.Shell();
-    
-    app.configure(function(){
-        app.use(shell.history({shell: app}));
-        app.use(shell.completer({shell: app}));
-        app.use(shell.router({shell: app}));
-        app.use(shell.help({shell: app, introduction: true}));
-        app.use(shell.error({shell: app}));
+    var shell = require('shell');
+    // Initialization
+    var app = new shell.Shell();
+    // Plugins registration
+    app.configure(function() {
+        app.use(shell.history({
+            shell: app
+        }));
+        app.use(shell.completer({
+            shell: app
+        }));
+        app.use(shell.router({
+            shell: app
+        }));
+        app.use(shell.redis({
+            shell: app,
+            config: 'redis.conf',
+            pidfile: 'redis.pid'
+        }));
+        app.use(shell.help({
+            shell: app,
+            introduction: true
+        }));
     });
-    
-    app.on('exit', function(){
-        if(app.server){ app.server.kill(); }
-        if(app.client){ app.client.quit(); }
-    });
-    
-    app.cmd('start', 'Start the redis server', function(req, res, next){
-        app.server = spawn('redis-server', [__dirname+'/redis.conf']);
-        res.prompt();
-    });
-    
-    app.cmd('keys :pattern', 'Find keys', function(req, res, next){
+    // Command registration
+    app.cmd('redis keys :pattern', 'Find keys', function(req, res, next){
         if(!app.client){
             app.client = require('redis').createClient();
         }
@@ -35,6 +38,12 @@ Create nice looking shell applications in minutes with Connect/Express inspired 
             res.cyan(keys.join('\n')||'no keys');
             res.prompt();
         });
+    });
+    // Event notification
+    app.on('redis quit', function(){
+        if(app.client){
+            app.client.quit();
+        }
     });
 
 ## Installation
@@ -74,6 +83,14 @@ Shell settings may be set by calling `app.set('key', value)` and may be retrieve
 -   *env*, the running environment, default to `NODE_ENV` if defined.
 -   *isShell*, detect wether the command is runned inside a shell are as a single command.
 -   *project_dir*, return the project root directory path or null if node was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
+
+## Shell events
+
+By extending `EventEmitter`, the following events are thrown:
+
+-   *"command"*, listen to all executed command, provide the command name as first argument
+-   *command*, listen to a particular event
+-   *"exit"*, called on application exit
 
 ## Routes plugin
 
