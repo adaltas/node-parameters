@@ -102,6 +102,7 @@ A route is made of a command pattern, an optional description and one or more ro
 Middlewares recieve three parameters, a request object, a response object and a function.
 
 The request object contains the following properties:
+
 -   *command*, command entered by the user
 -   *params*, parameters object extracted from the command
 
@@ -110,17 +111,20 @@ The response object inherit from styles which contains various utility functions
 ## History plugin
 
 Persist command history between multiple sessions. Options passed during creation are:
+
 -   *shell*, required
 -   *historyFile*, default to `process.cwd()+'/.node_shell'`
 
 ## Completer plugin
 
 Provide tab completion. Options passed during creation are:
+
 -   *shell*, required
 
 ## Help plugin
 
 Display help when use type "help" or when he press `enter` on empty commands. Command help is only displayed if a description was provided during the command registration. Additionnaly, a new `shell.help()` function is made available. Options passed during creation are:
+
 -   *shell*, required
 -   *introduction*, Print message 'Type "help" or press enter for a list of commands' if boolean true or a custom message if a string
 
