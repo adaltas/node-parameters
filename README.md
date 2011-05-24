@@ -1,6 +1,6 @@
-# Shell - Full features and pretty console applications
+# Shell - Nice looking shell applications with pluggable middlewares.
 
-Create nice looking shell applications in minutes with Connect/Express inspired API and functionnalities.
+The project brings a Connect/Express inspired API and similar functionnalities to console based applications.
 
 ## Quick exemple, a redis client
 
