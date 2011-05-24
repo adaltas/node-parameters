@@ -62,7 +62,8 @@ The project brings a Connect/Express inspired API and similar functionnalities t
         app.set('title', 'Production Mode');
     });
 
-The constructor `shell.Shell` take an optional object. options are
+The constructor `shell.Shell` take an optional object. options are:
+
 -   *stdin*, Source to read from
 -   *stdout*, Destination to write to
 
