@@ -190,7 +190,7 @@ Exemple:
         }));
     });
 
-Important, cloud9 must be installed as a NPM module but there's a problem. At the moment, the NPM module is based on the master branch of cloud9 on GitHub and is expecteding a Node version of 0.4.1. Here's the procedure to use a newer version:
+Important, cloud9 must be installed as a NPM module but there's a problem. At the moment, the NPM module is based on the master branch of cloud9 on GitHub (version "0.3.0") and is expecting a Node version of 0.4.1. Here's the procedure to use the newer version on the devel branch:
 
     git clone https://github.com/ajaxorg/cloud9.git
     git checkout -b devel origin/devel
