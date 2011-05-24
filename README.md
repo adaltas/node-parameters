@@ -64,12 +64,14 @@ The project brings a Connect/Express inspired API and similar functionnalities t
 
 The constructor `shell.Shell` take an optional object. options are:
 
+-	*env*, defined the running environment
+-	*prompt*, Character for command prompt, default to ">>"
 -   *stdin*, Source to read from
 -   *stdout*, Destination to write to
 
 Like with Express, `app.configure` allows the customization of plugins for all or specific environments while `app.use` register plugins.
 
-If `app.configure` is called without specifying the environment as the first argument, the provided callback will always be called. Otherwise, the environment must match the global variable `NODE_ENV` or the `env` setting.
+If `app.configure` is called without specifying the environment as the first argument, the provided callback will always be called. Otherwise, the environment must match the `env` setting or the global variable `NODE_ENV`.
 
 ## Shell settings
 
@@ -81,7 +83,7 @@ Shell settings may be set by calling `app.set('key', value)` and may be retrieve
         console.log(app.set('env'));
     });
 
--   *env*, the running environment, default to `NODE_ENV` if defined.
+-   *env*, the running environment, default to the `env` setting or `NODE_ENV` if defined.
 -   *isShell*, detect wether the command is runned inside a shell are as a single command.
 -   *project_dir*, return the project root directory path or null if node was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
 
@@ -118,7 +120,7 @@ Provide tab completion. Options passed during creation are:
 
 ## Help plugin
 
-Display help when use type "help" or when he press `enter` on empty prompt. Command help is only displayed if a description was provided during the command registration. Additionnaly, a new `shell.help()` function is made available. Options passed during creation are:
+Display help when use type "help" or when he press `enter` on empty commands. Command help is only displayed if a description was provided during the command registration. Additionnaly, a new `shell.help()` function is made available. Options passed during creation are:
 -   *shell*, required
 -   *introduction*, Print message 'Type "help" or press enter for a list of commands' if boolean true or a custom message if a string
 
