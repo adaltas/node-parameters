@@ -7,3 +7,5 @@ samples/redis/dump.rdb
 samples/cloud9/cloud9.err.log
 samples/cloud9/cloud9.out.log
 samples/cloud9/cloud9.pid
+samples/redis/redis.err.log
+samples/redis/redis.out.log

@@ -10,6 +10,7 @@ module.exports = {
     help: require('./lib/plugins/help'),
     history: require('./lib/plugins/history'),
     router: require('./lib/plugins/router'),
+    redis: require('./lib/plugins/redis'),
     routes: {
         shellOnly: require('./lib/routes/shellOnly')
     }

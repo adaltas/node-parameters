@@ -104,6 +104,34 @@ Display help when use type "help" or when he press `enter` on empty prompt. Comm
 -   *shell*, required
 -   *introduction*, Print message 'Type "help" or press enter for a list of commands' if boolean true or a custom message if a string
 
+## Redis plugin
+
+Register two commands, `redis start` and `redis stop`. The following properties may be provided as settings:
+
+-   *shell*, required, a reference to your shell application.
+-   *config*, path to the configuration file. Required to launch redis.
+-   *detach*, Preserve the Cloud9 process when exiting the shell, only apply in shell mode.
+-   *pidfile*, Path to the file storing the process id, apply in command mode or in shell if option "detach" is true. Default to "/tmp/cloud9.pid"
+-   *stdout*, writable stream or file path to redirect cloud9 stdout.
+-   *stderr*, writable stream or file path to redirect cloud9 stderr.
+
+Exemple:
+    
+    var app = new shell.Shell();
+    app.configure(function() {
+        app.use(shell.router({
+            shell: app
+        }));
+        app.use(shell.redis({
+            shell: app,
+            config: __dirname+'/redis.conf')
+        }));
+        app.use(shell.help({
+            shell: app,
+            introduction: true
+        }));
+    });
+
 ## Cloud9 plugin
 
 Register two commands, `cloud9 start` and `cloud9 stop`. The following properties may be provided as settings:
