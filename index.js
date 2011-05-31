@@ -9,6 +9,7 @@ module.exports = {
     error: require('./lib/plugins/error'),
     help: require('./lib/plugins/help'),
     history: require('./lib/plugins/history'),
+    http: require('./lib/plugins/http'),
     router: require('./lib/plugins/router'),
     redis: require('./lib/plugins/redis'),
     routes: {
