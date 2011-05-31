@@ -128,16 +128,35 @@ Display help when use type "help" or when he press `enter` on empty commands. Co
 -   *shell*, required
 -   *introduction*, Print message 'Type "help" or press enter for a list of commands' if boolean true or a custom message if a string
 
+## HTTP server
+
+Register two commands, `http start` and `http stop`. The start command will search for "./server.js" and "./app.js" to run by `node`.
+    
+    var app = new shell.Shell();
+    app.configure(function() {
+        app.use(shell.router({
+            shell: app
+        }));
+        app.use(shell.redis({
+            shell: app,
+            config: __dirname+'/redis.conf')
+        }));
+        app.use(shell.help({
+            shell: app,
+            introduction: true
+        }));
+    });
+
 ## Redis plugin
 
 Register two commands, `redis start` and `redis stop`. The following properties may be provided as settings:
 
--   *shell*, required, a reference to your shell application.
--   *config*, path to the configuration file. Required to launch redis.
+-   *shell*, Required, a reference to your shell application.
+-   *config*, Path to the configuration file. Required to launch redis.
 -   *detach*, Preserve the Cloud9 process when exiting the shell, only apply in shell mode.
 -   *pidfile*, Path to the file storing the process id, apply in command mode or in shell if option "detach" is true. Default to "/tmp/cloud9.pid"
--   *stdout*, writable stream or file path to redirect cloud9 stdout.
--   *stderr*, writable stream or file path to redirect cloud9 stderr.
+-   *stdout*, Writable stream or file path to redirect cloud9 stdout.
+-   *stderr*, Writable stream or file path to redirect cloud9 stderr.
 
 Exemple:
     
@@ -158,11 +177,12 @@ Exemple:
 
 ## Cloud9 plugin
 
-Register two commands, `cloud9 start` and `cloud9 stop`. The following properties may be provided as settings:
+Register two commands, `cloud9 start` and `cloud9 stop`. Unless provided, the Cloud9 workspace will be automatically discovered if your project root directory contains a "package.json" file or a "node_module" directory.
+
+Options:
 
 -   *shell*, required, a reference to your shell application.
 -   *config*, load the configuration from a config file. Overrides command-line options. Default to `null`.
--   *detach*, Preserve the Cloud9 process when exiting the shell, only apply in shell mode.
 -   *pidfile*, Path to the file storing the process id, apply in command mode or in shell if option "detach" is true. Default to "/tmp/cloud9.pid"
 -   *group*, Run child processes with a specific group
 -   *user*, Run child processes as a specific user.
@@ -170,8 +190,9 @@ Register two commands, `cloud9 start` and `cloud9 stop`. The following propertie
 -   *ip*, IP address where Cloud9 will serve from. Default to `"127.0.0.1"`.
 -   *port*, Port number where Cloud9 will serve from. Default to `3000`.
 -   *workspace*, path to the workspace that will be loaded in Cloud9, Default to `Shell.set('project_dir')`.
--   *stdout*, writable stream or file path to redirect cloud9 stdout.
--   *stderr*, writable stream or file path to redirect cloud9 stderr.
+-   *detach*, Preserve the Cloud9 process when exiting the shell, only apply in shell mode.
+-   *stdout*, Writable stream or file path to redirect cloud9 stdout.
+-   *stderr*, Writable stream or file path to redirect cloud9 stderr.
 
 Exemple:
     
@@ -193,7 +214,40 @@ Exemple:
 Important, cloud9 must be installed as a NPM module but there's a problem. At the moment, the NPM module is based on the master branch of cloud9 on GitHub (version "0.3.0") and is expecting a Node version of 0.4.1. Here's the procedure to use the newer version on the devel branch:
 
     git clone https://github.com/ajaxorg/cloud9.git
+    cd cloud9
     git checkout -b devel origin/devel
+    git submodule update --init --recursive
     npm link
 
+
+## CoffeeScript plugin
+
+Start Coffee in "wath" mode such as scripts are instantly compiled into Javascript.
+
+Options:
+
+-	*src*, Directory where ".coffee" are stored. Each ".coffee" script will be compiled into a .js JavaScript file of the same name.
+-	*output*, Directory to write out all compiled JavaScript files. Use in conjunction with "compile".
+-	*lint*, If the jsl (JavaScript Lint) command is installed, use it to check the compilation of a CoffeeScript file.
+-	*require*, Load a library before compiling or executing your script. Can be used to hook in to the compiler (to add Growl notifications, for example).
+-   *detach*, Preserve the CoffeeScript process when exiting the shell, only apply in shell mode.
+-   *stdout*, Writable stream or file path to redirect cloud9 stdout.
+-   *stderr*, Writable stream or file path to redirect cloud9 stderr.
+-	*workspace*, Project directory used to resolve relative paths.
+
+Exemple:
+
+    var app = new shell.Shell();
+    app.configure(function() {
+        app.use(shell.router({
+            shell: app
+        }));
+        app.use(shell.coffee({
+            shell: app
+        }));
+        app.use(shell.help({
+            shell: app,
+            introduction: true
+        }));
+    });
 

@@ -5,6 +5,7 @@ module.exports = {
     styles: require('./lib/styles'),
     // Plugins
     cloud9: require('./lib/plugins/cloud9'),
+    coffee: require('./lib/plugins/coffee'),
     completer: require('./lib/plugins/completer'),
     error: require('./lib/plugins/error'),
     help: require('./lib/plugins/help'),

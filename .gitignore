@@ -9,3 +9,5 @@ samples/cloud9/cloud9.out.log
 samples/cloud9/cloud9.pid
 samples/redis/redis.err.log
 samples/redis/redis.out.log
+samples/coffee/coffee.err.log
+samples/coffee/coffee.out.log
