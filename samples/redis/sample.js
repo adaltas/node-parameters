@@ -1,7 +1,7 @@
 #!/usr/bin/env node
     
     process.chdir(__dirname);
-	
+    
     var shell = require('shell');
     // Initialization
     var app = new shell.Shell();
