@@ -13,6 +13,7 @@ module.exports = {
     http: require('./lib/plugins/http'),
     router: require('./lib/plugins/router'),
     redis: require('./lib/plugins/redis'),
+    test: require('./lib/plugins/test'),
     routes: {
         shellOnly: require('./lib/routes/shellOnly')
     }
