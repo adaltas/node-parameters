@@ -1,14 +1,21 @@
-{ "name": "shell"
-, "version": "0.0.9"
-, "description": "Full features and pretty console applications"
-, "author": "David Worms <david@adaltas.com>"
-, "contributors":
-  [ { "name": "David Worms", "email": "david@adaltas.com" } ]
-, "engines": { "node": ">= 0.1.90" }
-, "dependencies" : {}
-, "keywords": ["console", "colors", "xterm"]
-, "repository": 
-  { "type" : "git"
-  , "url" : "https://github.com/wdavidw/node-shell.git"
-  }
+{
+    "name": "shell",
+    "version": "0.0.9",
+    "description": "Full features and pretty console applications",
+    "author": "David Worms <david@adaltas.com>",
+    "contributors": [{
+        "name": "David Worms",
+        "email": "david@adaltas.com"
+    }],
+    "engines": {
+        "node": ">= 0.1.90"
+    },
+    "dependencies": {
+        "coffee-script": "lastest"
+    },
+    "keywords": ["console", "colors", "xterm"],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/wdavidw/node-shell.git"
+    }
 }
