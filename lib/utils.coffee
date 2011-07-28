@@ -2,7 +2,7 @@
 module.exports.pad = (n, size) ->
     n = n.toString()
     pad = ''
-    size = size - n.length;
+    size = size - n.length
     for i in [0 .. size]
         pad += ' '
     n + pad
@@ -15,5 +15,4 @@ module.exports.flatten = (arr, ret) ->
       exports.flatten arr[i], ret
     else
       ret.push arr[i]
-  }
   ret
