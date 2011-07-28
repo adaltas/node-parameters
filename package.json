@@ -1,6 +1,6 @@
 {
     "name": "shell",
-    "version": "0.0.9",
+    "version": "0.10.0",
     "description": "Full features and pretty console applications",
     "author": "David Worms <david@adaltas.com>",
     "contributors": [{
@@ -11,7 +11,7 @@
         "node": ">= 0.1.90"
     },
     "dependencies": {
-        "coffee-script": "lastest"
+        "coffee-script": "latest"
     },
     "keywords": ["console", "colors", "xterm"],
     "repository": {
