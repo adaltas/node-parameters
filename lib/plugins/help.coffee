@@ -11,7 +11,7 @@ module.exports = (settings) ->
         res.ln()
         routes = shell.routes
         for route in routes
-            tetx = utils.pad route.command, 20
+            text = utils.pad route.command, 20
             res
             .cyan(text)
             .white(route.description)
