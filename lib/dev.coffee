@@ -1,4 +1,6 @@
-##!/usr/bin/env coffee
+
+#to try
+#!/usr/bin/env coffee
 
 process.chdir __dirname + '/../'
 
@@ -14,9 +16,9 @@ app.configure ->
     app.use shell.router
         shell: app
     app.use shell.cloud9
-        shell: app,
-        ip: '127.0.0.1',
-        port: '4102',
+        shell: app
+        ip: '127.0.0.1'
+        port: '4102'
         detach: false
     app.use shell.coffee
         shell: app
