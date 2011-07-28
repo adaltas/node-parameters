@@ -37,7 +37,7 @@ Shell = module.exports = (settings) ->
         console.error e.message
         console.error e.stack
         process.exit()
-    this.isShell = process.argv.length is 2
+    this.isShell = settings.isShell ? process.argv.length is 2
     # Project root directory
     this.project_dir = null
     dirs = mod._nodeModulePaths process.cwd()
@@ -59,9 +59,11 @@ util.inherits Shell, EventEmitter
 
 # Configure callback for the given `env`
 Shell.prototype.configure = (env, fn) ->
-    fn = env
-    env = 'all' if typeof env is 'function'
-    fn.call this if 'all' == env || env == this.settings.env
+    if typeof env is 'function'
+        fn = env
+        env = 'all'
+    if env is 'all' or env is this.settings.env
+        fn.call this
     this
 
 # Configure callback for the given `env`
