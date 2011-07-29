@@ -30,7 +30,7 @@ module.exports = (settings) ->
                 then fs.createWriteStream settings.stderr
                 else settings.stderr
             )
-        if not shell.isShell and settings.detach
+        if not shell.isShell or settings.detach
             pidfile = settings.pidfile or '/tmp/redis.pid'
             fs.writeFileSync pidfile, '' + redis.pid
         # Give a chance to redis to startup
@@ -42,7 +42,7 @@ module.exports = (settings) ->
         if not shell.isShell or settings.detach
             pidfile = settings.pidfile or '/tmp/redis.pid'
             if not path.existsSync pidfile
-                return res.red('Failed to stop redis').prompt()
+                return res.red('Failed to stop redis: no pid file').prompt()
             pid = fs.readFileSync pidfile
             redis = spawn 'kill', [pid]
             redis.on 'exit', (code) ->

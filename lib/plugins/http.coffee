@@ -36,18 +36,20 @@ module.exports = (settings) ->
         else
             next new Error('Failed to find appropriate "server.js" or "app.js" file')
         args = args.join ' '
+        console.log args
         http = exec args
-        done = false
-        interval = setInterval ->
-            clearInterval interval if done
-        , 100
+        #done = false
+        #interval = setInterval ->
+            #console.log done
+            #clearInterval interval if done
+        #, 100
         http.on 'exit', (code) ->
             if   code is 0
             then res.cyan settings.message_start
             else res.red 'Error while starting HTTP server'
             fs.unlinkSync pidfile if path.existsSync pidfile
             res.prompt()
-            done = true
+            #done = true
         if pipeStdout
             http.stdout.pipe(
                 if   typeof settings.stdout is 'string'
@@ -63,6 +65,10 @@ module.exports = (settings) ->
         if detached
             pidfile = settings.pidfile or '/tmp/http.pid'
             fs.writeFileSync pidfile, '' + http.pid
+        setTimeout ->
+            res.cyan('HTTP server started').ln() if http
+            res.prompt()
+        , 500
     shell.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->
         if not shell.isShell or settings.detach
             pidfile = settings.pidfile or '/tmp/http.pid'
