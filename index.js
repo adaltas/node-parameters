@@ -1,4 +1,4 @@
-require("coffee-script")
+require('coffee-script')
 
 module.exports = {
     // Core

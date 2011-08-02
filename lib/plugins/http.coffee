@@ -31,12 +31,15 @@ module.exports = (settings) ->
             args.push settings.stderr
         if path.existsSync settings.workspace + '/server.js'
             args.unshift 'node ' + settings.workspace + '/server'
+        else if path.existsSync settings.workspace + '/server.coffee'
+            args.unshift 'coffee ' + settings.workspace + '/server.coffee'
         else if path.existsSync settings.workspace + '/app.js'
             args.unshift 'node ' + settings.workspace + '/app'
+        else if path.existsSync settings.workspace + '/app.coffee'
+            args.unshift 'coffee ' + settings.workspace + '/app.coffee'
         else
             next new Error('Failed to find appropriate "server.js" or "app.js" file')
         args = args.join ' '
-        console.log args
         http = exec args
         #done = false
         #interval = setInterval ->
