@@ -21,8 +21,8 @@ module.exports = (settings) ->
         detached = not shell.isShell or settings.detach
         pipeStdout = settings.stdout and not detached
         pipeStderr = settings.stderr and not detached
-        args.push '-w'
-        args.push settings.workspace
+        #args.push '-w'
+        #args.push settings.workspace
         if not pipeStdout
             args.push '>'
             args.push settings.stdout
