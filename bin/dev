@@ -5,7 +5,6 @@ process.chdir __dirname + '/../'
 shell = require '../index'
 
 app = shell.Shell
-    project_dir: __dirname + '/../'
 app.configure ->
     app.use shell.history
         shell: app
