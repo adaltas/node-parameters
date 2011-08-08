@@ -21,11 +21,11 @@ bgcolors =
     cyan: 46
     white: 47
 
-module.exports = Styles = (settings) ->
+module.exports = Styles = (settings = {}) ->
     if this not instanceof Styles
         return new Styles settings
-    this.settings ?= {}
-    this.settings.stdout ?= process.stdout
+    this.settings = settings
+    this.settings.stdout = settings.stdout ? process.stdout
     # Current state
     this.current =
         weight: 'regular'

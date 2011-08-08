@@ -98,6 +98,9 @@ module.exports = router = (settings) ->
         route.keys = keys
         routes.push route
         this
+    # Register 'quit' command
+    shell.cmd 'quit', 'Exit this shell', shell.quit
+    # middleware
     router = (req, res, next) ->
         route = null
         self = this

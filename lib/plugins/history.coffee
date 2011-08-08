@@ -19,14 +19,15 @@ module.exports = (settings) ->
         crypto.createHash('md5').update(settings.shell.project_dir).digest('hex')
     if path.existsSync settings.historyFile
         try
-            settings.shell.interface.history = JSON.parse fs.readFileSync(settings.historyFile, 'utf8')
+            json = fs.readFileSync(settings.historyFile, 'utf8') or '[]'
+            settings.shell.interface.history = JSON.parse json
         catch e
             settings.shell.styles.red('Corrupted history file').ln()
     historyStream = fs.createWriteStream settings.historyFile, {flag: 'w'}
     Interface.prototype._addHistory = ((parent) -> ->
-        if this.history.length
-            buffer = new Buffer JSON.stringify( this.history )
+        if @history.length
+            buffer = new Buffer JSON.stringify( @history )
             fs.write historyStream.fd, buffer, 0, buffer.length, 0
-        parent.apply this, arguments
+        parent.apply @, arguments
     ) Interface.prototype._addHistory
     null

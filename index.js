@@ -3,7 +3,7 @@ require('coffee-script')
 module.exports = {
     // Core
     Shell: require('./lib/Shell'),
-    styles: require('./lib/styles'),
+    styles: require('./lib/Styles'),
     // Plugins
     cloud9: require('./lib/plugins/cloud9'),
     coffee: require('./lib/plugins/coffee'),
