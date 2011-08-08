@@ -2,9 +2,9 @@
 
 process.chdir __dirname + '/../'
 
-shell = require '../index'
+shell = require 'shell'
 
-app = shell.Shell
+app = shell()
 app.configure ->
     app.use shell.history
         shell: app
