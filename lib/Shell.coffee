@@ -5,7 +5,7 @@ path = require 'path'
 readline = require 'readline'
 events = require 'events'
 EventEmitter = events.EventEmitter
-styles = require './styles'
+styles = require './Styles'
 Request = require './Request'
 Response = require './Response'
 

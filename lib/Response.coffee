@@ -1,5 +1,5 @@
 
-styles = require './styles'
+styles = require './Styles'
 
 module.exports = Response = (settings) ->
     this.shell = settings.shell
