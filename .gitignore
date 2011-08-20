@@ -1,4 +1,5 @@
 .*
+node_modules
 samples/http/db/*
 samples/http/logs/*
 samples/http/tmp/*
