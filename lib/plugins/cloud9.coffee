@@ -1,7 +1,7 @@
 
 fs = require('fs')
 path = require('path')
-exec = require('child_process').exec
+spawn = require('child_process').spawn
 
 module.exports = (settings) ->
     # Validation
@@ -9,7 +9,7 @@ module.exports = (settings) ->
     shell = settings.shell
     # Default settings
     settings.workspace ?= shell.project_dir
-    throw new Error('No workspace provided') if not settings.workspace
+    throw new Error 'No workspace provided' if not settings.workspace
     settings.stdout ?= '/dev/null'
     settings.stderr ?= '/dev/null'
     # Register commands
@@ -17,7 +17,7 @@ module.exports = (settings) ->
     shell.on 'exit', ->
         cloud9.kill() if shell.isShell and not settings.detach and cloud9
     shell.cmd 'cloud9 start', 'Start Cloud9', (req, res, next) ->
-        args = [];
+        args = []
         detached = not shell.isShell or settings.detach
         args.push '-w'
         args.push settings.workspace
@@ -40,14 +40,10 @@ module.exports = (settings) ->
             args.push '-p'
             args.push settings.port
         if detached
-            args.push '>'
-            args.push settings.stdout or '/dev/null'
-        if detached
-            args.push '2>'
-            args.push settings.stderr or '/dev/null'
-        args.unshift 'cloud9'
-        args = args.join ' '
-        cloud9 = exec args
+            args.push '</dev/null'
+            args.push '>' + settings.stdout
+            args.push '2>' + settings.stderr
+        cloud9 = spawn 'cloud9', args #, {setsid: true}
         if detached
             pidfile = settings.pidfile or '/tmp/cloud9.pid'
             fs.writeFileSync pidfile, '' + cloud9.pid
@@ -68,18 +64,15 @@ module.exports = (settings) ->
             if cloud9
                 ip = settings.ip or '127.0.0.1'
                 port = settings.port or 3000
-                message = "Cloud9 started http://#{ ip }:#{ port }"
+                message = "Cloud9 started http://#{ip}:#{port}"
                 res.cyan( message ).ln()
             res.prompt()
-        , 500
+        , 600
     shell.cmd 'cloud9 stop', 'Stop Cloud9', (req, res, next) ->
-        if not shell.isShell or settings.detach or not cloud9
+        if not shell.isShell or settings.detach
             pidfile = settings.pidfile or '/tmp/cloud9.pid'
             pid = fs.readFileSync pidfile
-            cmds = []
-            cmds.push "for i in `ps -ef| awk '$3 == '#{ pid }' { print $2 }'` ; do kill $i ; done"
-            cmds.push "kill #{ pid }"
-            cloud9 = exec cmds.join(' && ')
+            cloud9 = spawn 'kill', [pid]
             cloud9.on 'exit', (code) ->
                 if   code is 0
                 then res.cyan('Cloud9 successfully stoped').ln()
@@ -93,6 +86,6 @@ module.exports = (settings) ->
                 res.prompt()
             cloud9.kill()
         else
-            console.log 'this should not appear'
+            res.red('Cloud9 was not started').ln()
             res.prompt()
 
