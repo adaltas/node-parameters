@@ -1,7 +1,4 @@
 
-fs = require 'fs'
-path = require 'path'
-
 module.exports = (settings) ->
     # Validation
     throw new Error 'No shell provided' if not settings.shell
@@ -12,7 +9,7 @@ module.exports = (settings) ->
         routes = shell.routes
         for route in routes
             command = route.command
-            if command.substr 0, text.length is text
+            if command.substr(0, text.length) is text
                 suggestions.push command
         [suggestions, text]
     null
