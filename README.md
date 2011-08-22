@@ -6,7 +6,7 @@ The project brings a Connect/Express inspired API and similar functionnalities t
 
     var shell = require('shell');
     // Initialization
-    var app = new shell.Shell();
+    var app = new shell();
     // Plugins registration
     app.configure(function() {
         app.use(shell.history({
@@ -48,11 +48,11 @@ The project brings a Connect/Express inspired API and similar functionnalities t
 
 ## Installation
 
-    `npm install shell`
+    npm install shell
 
 ## Creating and configuring
 
-    var app = new shell.Shell();
+    var app = new shell();
     app.configure(function() {
         app.use(shell.history({shell: app}));
         app.use(shell.completer({shell: app}));
@@ -62,7 +62,7 @@ The project brings a Connect/Express inspired API and similar functionnalities t
         app.set('title', 'Production Mode');
     });
 
-The constructor `shell.Shell` take an optional object. options are:
+The constructor `shell` take an optional object. options are:
 
 -	*env*, defined the running environment
 -	*prompt*, Character for command prompt, default to ">>"
@@ -77,7 +77,7 @@ If `app.configure` is called without specifying the environment as the first arg
 
 Shell settings may be set by calling `app.set('key', value)` and may be retrieved by calling the same function without a second argument.
 
-    var app = new shell.Shell();
+    var app = new shell();
     app.set('env', 'prod');
     app.configure('prod', function() {
         console.log(app.set('env'));
@@ -89,10 +89,10 @@ Shell settings may be set by calling `app.set('key', value)` and may be retrieve
 
 ## Shell events
 
-By extending `EventEmitter`, the following events are thrown:
+By extending `EventEmitter`, the following events are emitted:
 
 -   *"command"*, listen to all executed command, provide the command name as first argument
--   *command*, listen to a particular event
+-   *#{command}*, listen to a particular event
 -   *"exit"*, called on application exit
 
 ## Routes plugin
@@ -132,7 +132,7 @@ Display help when use type "help" or when he press `enter` on empty commands. Co
 
 Register two commands, `http start` and `http stop`. The start command will search for "./server.js" and "./app.js" to run by `node`.
     
-    var app = new shell.Shell();
+    var app = new shell();
     app.configure(function() {
         app.use(shell.router({
             shell: app
@@ -160,7 +160,7 @@ Register two commands, `redis start` and `redis stop`. The following properties 
 
 Exemple:
     
-    var app = new shell.Shell();
+    var app = new shell();
     app.configure(function() {
         app.use(shell.router({
             shell: app
@@ -196,7 +196,7 @@ Options:
 
 Exemple:
     
-    var app = new shell.Shell();
+    var app = new shell();
     app.configure(function() {
         app.use(shell.router({
             shell: app
@@ -237,7 +237,7 @@ Options:
 
 Exemple:
 
-    var app = new shell.Shell();
+    var app = new shell();
     app.configure(function() {
         app.use(shell.router({
             shell: app
