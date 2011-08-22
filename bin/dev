@@ -16,7 +16,6 @@ app.configure ->
         shell: app
         ip: '127.0.0.1'
         port: '4102'
-        detach: false
     app.use shell.coffee
         shell: app
     app.use shell.help

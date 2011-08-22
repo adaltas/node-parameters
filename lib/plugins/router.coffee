@@ -22,28 +22,32 @@ querystring =
                 obj[k].push v
         obj
 
-normalizeCommand = (command, keys) ->
+normalize = (command, keys, sensitive) ->
     command = command
     .concat('/?')
-    .replace /\/\(/g, '(?:/'
-    .replace /(\/)?(\.)?:(\w+)(\?)?/g, (_, slash, format, key, optional) ->
+    .replace(/\/\(/g, '(?:/')
+    .replace(/(\/)?(\.)?:(\w+)(\?)?/g, (_, slash, format, key, optional) ->
         keys.push key
         slash ?= ''
-        ''
-        + (if optional then '' else slash)
-        + '(?:'
-        + (if optional then slash else '')
-        + (format or '') + '([^/.]+))'
-        + (optional or '')
+        ''.concat(
+            (if optional then '' else slash),
+            '(?:',
+            (if optional then slash else ''),
+            (format or '') + '([^/.]+))',
+            (optional or '')
+        )
+    )
     .replace(/([\/.])/g, '\\$1')
     .replace(/\*/g, '(.+)')
-    new RegExp '^' + command + '$', 'i'
+    new RegExp '^' + command + '$', ( 'i' if sensitive? )
 
 match = (req, routes, i) ->
-    from ?= 0
-    to = routes.length - 1
+    #from ?= 0
+    #to = routes.length - 1
     #for (len = routes.length; i < len; ++i) {
-    for i in [from .. to]
+    #for i in [from .. to]
+    i ?= 0
+    while i < routes.length
         route = routes[i]
         fn = route.callback
         regexp = route.regexp
@@ -53,7 +57,9 @@ match = (req, routes, i) ->
             route.params = {}
             index = 0
             #for (j = 1, len = captures.length; j < len; ++j) {
-            for j in [1 .. captures.length]
+            #for j in [1 .. captures.length]
+            j = 1
+            while j < captures.length
                 key = keys[j-1]
                 val =
                     if typeof captures[j] is 'string'
@@ -64,13 +70,17 @@ match = (req, routes, i) ->
                 else
                     route.params[''+index] = val
                     index++
+                j++
             req._route_index = i
             return route
+        i++
+    null
 
 module.exports = router = (settings) ->
     # Validation
     throw new Error 'No shell provided' if not settings.shell
     shell = settings.shell
+    settings.sensitive ?= true
     # Expose routes
     routes = shell.routes = []
     params = {}
@@ -94,7 +104,7 @@ module.exports = router = (settings) ->
         route.regexp = 
             if   route.command instanceof RegExp
             then route.command
-            else normalizeCommand route.command, keys
+            else normalize route.command, keys, settings.sensitive
         route.keys = keys
         routes.push route
         this
@@ -105,15 +115,18 @@ module.exports = router = (settings) ->
         route = null
         self = this
         i = 0
-        do (i) ->
+        pass = (i) ->
             route = match req, routes, i
             return next() if not route
             i = 0
             keys = route.keys
             req.params = route.params
             # Param preconditions
-            err = null
-            do (err) ->
+            # From expresso guide: There are times when we may want to "skip" passed 
+            # remaining route middleware, but continue matching subsequent routes. To 
+            # do this we invoke `next()` with the string "route" `next('route')`. If no 
+            # remaining routes match the request url then Express will respond with 404 Not Found.
+            param = (err) ->
                 try
                     key = keys[ i++ ]
                     val = req.params[ key ]
@@ -156,3 +169,5 @@ module.exports = router = (settings) ->
                         param()
                 catch err
                     next err
+            param()
+        pass()

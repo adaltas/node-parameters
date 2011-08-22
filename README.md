@@ -97,9 +97,45 @@ By extending `EventEmitter`, the following events are emitted:
 
 ## Routes plugin
 
-A route is made of a command pattern, an optional description and one or more route specific middleware.
+The functionalities are a full transcription of the ones present Express. Options passed during creation are:
 
-Middlewares recieve three parameters, a request object, a response object and a function.
+-   *shell*, required
+-	*sensitive*, optional, default to false, set to true if the match should be case sensitive.
+
+New routes are defined with the `cmd` method. A route is made of pattern against which the user command is matched, an optional description and one or more route specific middlewares to handle the command. The pattern is either a string or a regular expression. Middlewares receive three parameters, a request object, a response object and a function. Command parameters are substituted and made available in the `params` object of the request parameter.
+
+
+    var app = new shell();
+    app.configure(function(){
+        app.use(shell.router({
+            shell: app
+        }));
+    });
+    // Route middleware
+    var auth = function(req, res, next){
+    	if(req.params.uid == process.getuid()){
+    		next()
+    	}else{
+    		throw new Error('Not me');
+    	}
+    }
+    // Global parameter substitution
+    app.param('uid', function(req, res, next){
+    	exec('whoami', function(err, stdout, sdterr){
+    		req.params.username = stdout;
+    		next();
+    	});
+    });
+    // Simple command
+    app.cmd('help', function(req, res){
+    	res.cyan('Run this command `./ami user ' + process.getuid() + '`');
+    	res.prompt()
+    });
+    // Command with parameter and two route middlewares
+    app.cmd('user :uid', auth, function(req, res){
+    	res.cyan('Yes, you are ' + req.params.username);
+    });
+
 
 The request object contains the following properties:
 
