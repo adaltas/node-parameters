@@ -38,7 +38,7 @@ module.exports = (settings) ->
         else if path.existsSync settings.workspace + '/app.coffee'
             args.unshift 'coffee ' + settings.workspace + '/app.coffee'
         else
-            next new Error('Failed to find appropriate "server.js" or "app.js" file')
+            next new Error 'Failed to discover a "server.js" or "app.js" file'
         args = args.join ' '
         http = exec args
         #done = false
