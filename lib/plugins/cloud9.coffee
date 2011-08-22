@@ -3,7 +3,7 @@ fs = require('fs')
 path = require('path')
 spawn = require('child_process').spawn
 
-module.exports = (settings) ->
+module.exports = (settings = {}) ->
     # Validation
     throw new Error 'No shell provided' if not settings.shell
     shell = settings.shell
@@ -12,10 +12,11 @@ module.exports = (settings) ->
     throw new Error 'No workspace provided' if not settings.workspace
     settings.stdout ?= '/dev/null'
     settings.stderr ?= '/dev/null'
-    # Register commands
     cloud9 = null
+    # Kill Cloud9 on exit if started in attached mode
     shell.on 'exit', ->
         cloud9.kill() if shell.isShell and not settings.detach and cloud9
+    # Register commands
     shell.cmd 'cloud9 start', 'Start Cloud9', (req, res, next) ->
         args = []
         detached = not shell.isShell or settings.detach
@@ -39,25 +40,28 @@ module.exports = (settings) ->
         if settings.port
             args.push '-p'
             args.push settings.port
+        ###
         if detached
             args.push '</dev/null'
             args.push '>' + settings.stdout
             args.push '2>' + settings.stderr
-        cloud9 = spawn 'cloud9', args #, {setsid: true}
-        if detached
-            pidfile = settings.pidfile or '/tmp/cloud9.pid'
-            fs.writeFileSync pidfile, '' + cloud9.pid
-        else
+        ###
+        cloud9 = spawn 'cloud9', args
+        if settings.stdout
             cloud9.stdout.pipe(
                 if   typeof settings.stdout is 'string'
                 then fs.createWriteStream settings.stdout
                 else settings.stdout
             )
+        if settings.stderr
             cloud9.stderr.pipe(
                 if   typeof settings.stderr is 'string'
                 then fs.createWriteStream settings.stderr
                 else settings.stderr
             )
+        if detached
+            pidfile = settings.pidfile or '/tmp/cloud9.pid'
+            fs.writeFileSync pidfile, '' + cloud9.pid
         # Give a chance to cloud9 to startup
         # and open a browser window in command mode
         setTimeout ->

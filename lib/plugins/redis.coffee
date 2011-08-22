@@ -15,9 +15,8 @@ module.exports = (settings) ->
     shell.on 'exit', ->
         redis.kill() if shell.isShell and not settings.detach and redis
     shell.cmd 'redis start', 'Start Redis', (req, res, next) ->
-        args = []
-        args.push settings.config
-        redis = spawn 'redis-server', args
+        detached = not shell.isShell or settings.detach
+        redis = spawn 'redis-server', [settings.config]
         if settings.stdout
             redis.stdout.pipe(
                 if   typeof settings.stdout is 'string'
@@ -30,7 +29,7 @@ module.exports = (settings) ->
                 then fs.createWriteStream settings.stderr
                 else settings.stderr
             )
-        if not shell.isShell or settings.detach
+        if detached
             pidfile = settings.pidfile or '/tmp/redis.pid'
             fs.writeFileSync pidfile, '' + redis.pid
         # Give a chance to redis to startup

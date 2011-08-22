@@ -1,35 +1,35 @@
 
 fs = require 'fs'
 path = require 'path'
-exec = require('child_process').exec
+spawn = require('child_process').spawn
 
-module.exports = (settings) ->
+module.exports = (settings = {}) ->
     # Validation
     throw new Error 'No shell provided' if not settings.shell
     shell = settings.shell
     # Default settings
     settings.workspace ?= shell.project_dir
     throw new Error 'No workspace provided' if not settings.workspace
-    # Register commands
+    settings.stdout ?= '/dev/null'
+    settings.stderr ?= '/dev/null'
     coffee = null
+    # Kill CoffeeScript on exit if started in attached mode
     shell.on 'exit', ->
-        if shell.isShell and not settings.detach and coffee
-            coffee.kill()
+        coffee.kill() if shell.isShell and not settings.detach and coffee
     # Sanitize a list of files separated by spaces
     enrichFiles = (files) ->
         return null if not settings.workspace
         return files.split(' ').map( (file) ->
-            if file.substr(0,1) isnt '/'
+            if file.substr(0, 1) isnt '/'
                 file = '/' + file
-            if file.substr(-1,1) isnt '/' and fs.statSync(file).isDirectory()
+            if file.substr(-1, 1) isnt '/' and fs.statSync(file).isDirectory()
                 file += '/'
             file
         ).join ' '
+    # Register commands
     shell.cmd 'coffee start', 'Start CoffeeScript', (req, res, next) ->
         args = []
         detached = not shell.isShell or settings.detach
-        pipeStdout = settings.stdout and not detached
-        pipeStderr = settings.stderr and not detached
         # Before compiling, concatenate all scripts together in the
         # order they were passed, and write them into the specified
         # file. Useful for building large projects.
@@ -54,15 +54,6 @@ module.exports = (settings) ->
         # safety wrapper. (Used for CoffeeScript as a Node.js module.)
         args.push '-b'
         ###
-        # Not sure if this apply to wath mode
-        # The node executable has some useful options you can set,
-        # such as --debug and --max-stack-size. Use this flag to
-        # forward options directly to Node.js. 
-        if(settings.nodejs){
-            args.push('--nodejs');
-            args.push(settings.nodejs);
-        }
-        ###
         # Write out all compiled JavaScript files into the specified
         # directory. Use in conjunction with --compile or --watch.
         # if(!settings.output && path.existsSync(settings.workspace+'/lib')){
@@ -81,22 +72,22 @@ module.exports = (settings) ->
         if settings.compile
             args.push '-c'
             args.push enrichFiles(settings.compile)
+        ###
         if not pipeStdout
             args.push '>'
             args.push settings.stdout || '/dev/null'
         if not pipeStderr
             args.push '2>'
             args.push settings.stderr || '/dev/null'
-        args.unshift 'coffee'
-        args = args.join ' '
-        coffee = exec args
-        if pipeStdout
+        ###
+        coffee = spawn 'coffee', args
+        if settings.stdout
             coffee.stdout.pipe(
                 if   typeof settings.stdout is 'string'
                 then fs.createWriteStream settings.stdout
                 else settings.stdout
             )
-        if pipeStderr
+        if settings.stderr
             coffee.stderr.pipe(
                 if   typeof settings.stderr is 'string'
                 then fs.createWriteStream settings.stderr
@@ -105,20 +96,17 @@ module.exports = (settings) ->
         if detached
             pidfile = settings.pidfile or '/tmp/coffee.pid'
             fs.writeFileSync pidfile, '' + coffee.pid
-        # Give a chance to coffee to startup
+        # Give a chance to CoffeeScript to startup
         setTimeout( ->
             res.cyan('CoffeeScript started').ln() if coffee
             res.prompt()
-        , 500)
+        , 600)
     shell.cmd 'coffee stop', 'Stop CoffeeScript', (req, res, next) ->
         if not shell.isShell or settings.detach or not coffee
             pidfile = settings.pidfile or '/tmp/coffee.pid'
             pid = fs.readFileSync pidfile
             cmds = []
-            cmds.push "for i in `ps -ef| awk '$3 == '#{pid}' { print $2 }'` ; do kill $i ; done"
-            cmds.push "kill #{pid}"
-            cmds = cmds.join ' && '
-            coffee = exec(cmds)
+            coffee = spawn 'kill', [pid]
             coffee.on 'exit', (code) ->
                 if   code is 0
                 then res.cyan 'coffee successfully stoped'
