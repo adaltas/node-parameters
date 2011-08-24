@@ -4,7 +4,7 @@
     
     var shell = require('shell');
     // Initialization
-    var app = new shell.Shell();
+    var app = shell();
     // Plugins registration
     app.configure(function() {
         app.use(shell.history({

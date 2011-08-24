@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
     var shell = require('shell'),
-        app = new shell.Shell();
+        app = new shell();
         
     app.configure(function(){
         app.use(shell.router({shell: app}));

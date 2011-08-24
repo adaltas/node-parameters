@@ -73,7 +73,7 @@ module.exports = (settings = {}) ->
             res.prompt()
         , 600
     shell.cmd 'cloud9 stop', 'Stop Cloud9', (req, res, next) ->
-        if not shell.isShell or settings.detach
+        unless shell.isShell or settings.detach
             pidfile = settings.pidfile or '/tmp/cloud9.pid'
             pid = fs.readFileSync pidfile
             cloud9 = spawn 'kill', [pid]
