@@ -5,6 +5,7 @@ process.chdir __dirname + '/../'
 shell = require 'shell'
 
 app = shell()
+
 app.configure ->
     app.use shell.history
         shell: app
@@ -23,3 +24,16 @@ app.configure ->
         introduction: true
     app.use shell.error
         shell: app
+
+app.cmd 'test short', (req, res) ->
+    res.cyan 'This was short'
+    res.prompt()
+
+app.cmd 'test long', (req, res) ->
+    for i in [0 .. 10]
+        message = []
+        for [0 .. 10]
+            message.push ' This was long'
+        res.cyan i + message.join(' ') + '\n'
+    res.prompt()
+    
