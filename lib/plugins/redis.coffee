@@ -1,60 +1,27 @@
 
-fs = require 'fs'
-path = require 'path'
-spawn = require('child_process').spawn
+process = require '../process'
 
 module.exports = (settings) ->
     # Validation
-    throw new Error 'No shell provided' if not settings.shell
-    throw new Error 'No path to the Redis configuration file' if not settings.config
+    throw new Error 'No shell provided' unless settings.shell
+    throw new Error 'No path to the Redis configuration file' unless settings.config
     shell = settings.shell
     # Default settings
     settings.workspace ?= shell.project_dir
     # Register commands
     redis = null
-    shell.on 'exit', ->
-        redis.kill() if shell.isShell and not settings.detach and redis
     shell.cmd 'redis start', 'Start Redis', (req, res, next) ->
-        detached = not shell.isShell or settings.detach
-        redis = spawn 'redis-server', [settings.config]
-        if settings.stdout
-            redis.stdout.pipe(
-                if   typeof settings.stdout is 'string'
-                then fs.createWriteStream settings.stdout
-                else settings.stdout
-            )
-        if settings.stderr
-            redis.stderr.pipe(
-                if   typeof settings.stderr is 'string'
-                then fs.createWriteStream settings.stderr
-                else settings.stderr
-            )
-        if detached
-            pidfile = settings.pidfile or '/tmp/redis.pid'
-            fs.writeFileSync pidfile, '' + redis.pid
-        # Give a chance to redis to startup
-        setTimeout ->
-            res.cyan('Redis started').ln() if redis
+        # Launch process
+        cmd = "redis-server #{settings.config}"
+        redis = process.start shell, settings, cmd, (err) ->
+            ip = settings.ip or '127.0.0.1'
+            port = settings.port or 3000
+            message = "Redis started"
+            res.cyan( message ).ln()
             res.prompt()
-        , 500
     shell.cmd 'redis stop', 'Stop Redis', (req, res, next) ->
-        if not shell.isShell or settings.detach
-            pidfile = settings.pidfile or '/tmp/redis.pid'
-            if not path.existsSync pidfile
-                return res.red('Failed to stop redis: no pid file').prompt()
-            pid = fs.readFileSync pidfile
-            redis = spawn 'kill', [pid]
-            redis.on 'exit', (code) ->
-                if   code is 0
-                then res.cyan 'Redis successfully stoped'
-                else res.red 'Error while stoping Redis'
-                fs.unlinkSync pidfile
-                res.prompt()
-        else if redis
-            redis.on 'exit', (code) ->
-                redis = null
-                res.cyan 'Redis successfully stopped'
-                res.prompt()
-            redis.kill()
-        else
+        process.stop settings, redis, (err, success) ->
+            if success
+            then res.cyan('Redis successfully stoped').ln()
+            else res.magenta('Redis was not started').ln()
             res.prompt()

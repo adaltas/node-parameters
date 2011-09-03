@@ -1,7 +1,16 @@
 
 fs = require 'fs'
-path = require 'path'
-spawn = require('child_process').spawn
+
+# Sanitize a list of files separated by spaces
+enrichFiles = (files) ->
+    return null if not settings.workspace
+    return files.split(' ').map( (file) ->
+        if file.substr(0, 1) isnt '/'
+            file = '/' + file
+        if file.substr(-1, 1) isnt '/' and fs.statSync(file).isDirectory()
+            file += '/'
+        file
+    ).join ' '
 
 module.exports = (settings = {}) ->
     # Validation
@@ -10,22 +19,7 @@ module.exports = (settings = {}) ->
     # Default settings
     settings.workspace ?= shell.project_dir
     throw new Error 'No workspace provided' if not settings.workspace
-    settings.stdout ?= '/dev/null'
-    settings.stderr ?= '/dev/null'
     coffee = null
-    # Kill CoffeeScript on exit if started in attached mode
-    shell.on 'exit', ->
-        coffee.kill() if shell.isShell and not settings.detach and coffee
-    # Sanitize a list of files separated by spaces
-    enrichFiles = (files) ->
-        return null if not settings.workspace
-        return files.split(' ').map( (file) ->
-            if file.substr(0, 1) isnt '/'
-                file = '/' + file
-            if file.substr(-1, 1) isnt '/' and fs.statSync(file).isDirectory()
-                file += '/'
-            file
-        ).join ' '
     # Register commands
     shell.cmd 'coffee start', 'Start CoffeeScript', (req, res, next) ->
         args = []
@@ -53,73 +47,29 @@ module.exports = (settings = {}) ->
         # Compile the JavaScript without the top-level function
         # safety wrapper. (Used for CoffeeScript as a Node.js module.)
         args.push '-b'
-        ###
         # Write out all compiled JavaScript files into the specified
         # directory. Use in conjunction with --compile or --watch.
-        # if(!settings.output && path.existsSync(settings.workspace+'/lib')){
-        #     settings.output = settings.workspace+'/lib/';
-        # }
         if settings.output
             args.push '-o'
             args.push enrichFiles(settings.output)
         # Compile a .coffee script into a .js JavaScript file
         # of the same name.
-        # if(!settings.compile && path.existsSync(settings.workspace+'/src')){
-        #     settings.compile = settings.workspace+'/src/';
-        # }
         if not settings.compile
             settings.compile = settings.workspace
         if settings.compile
             args.push '-c'
             args.push enrichFiles(settings.compile)
-        ###
-        if not pipeStdout
-            args.push '>'
-            args.push settings.stdout || '/dev/null'
-        if not pipeStderr
-            args.push '2>'
-            args.push settings.stderr || '/dev/null'
-        ###
-        coffee = spawn 'coffee', args
-        if settings.stdout
-            coffee.stdout.pipe(
-                if   typeof settings.stdout is 'string'
-                then fs.createWriteStream settings.stdout
-                else settings.stdout
-            )
-        if settings.stderr
-            coffee.stderr.pipe(
-                if   typeof settings.stderr is 'string'
-                then fs.createWriteStream settings.stderr
-                else settings.stderr
-            )
-        if detached
-            pidfile = settings.pidfile or '/tmp/coffee.pid'
-            fs.writeFileSync pidfile, '' + coffee.pid
-        # Give a chance to CoffeeScript to startup
-        setTimeout( ->
-            res.cyan('CoffeeScript started').ln() if coffee
+        cmd = 'coffee ' + args.join(' ')
+        coffee = process.start shell, settings, cmd, (err) ->
+            ip = settings.ip or '127.0.0.1'
+            port = settings.port or 3000
+            message = "CoffeeScript started"
+            res.cyan( message ).ln()
             res.prompt()
-        , 600)
     shell.cmd 'coffee stop', 'Stop CoffeeScript', (req, res, next) ->
-        if not shell.isShell or settings.detach or not coffee
-            pidfile = settings.pidfile or '/tmp/coffee.pid'
-            pid = fs.readFileSync pidfile
-            cmds = []
-            coffee = spawn 'kill', [pid]
-            coffee.on 'exit', (code) ->
-                if   code is 0
-                then res.cyan 'coffee successfully stoped'
-                else res.red 'Error while stoping coffee'
-                fs.unlinkSync pidfile
-                res.prompt()
-        else if coffee
-            coffee.on 'exit', (code) ->
-                coffee = null
-                res.cyan 'CoffeeScript successfully stopped'
-                res.prompt()
-            coffee.kill()
-        else
-            console.log 'this should not appear'
+        process.stop settings, coffee, (err, success) ->
+            if success
+            then res.cyan('CoffeeScript successfully stoped').ln()
+            else res.magenta('CoffeeScript was not started').ln()
             res.prompt()
 

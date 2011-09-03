@@ -1,7 +1,6 @@
 
-fs = require 'fs'
 path = require 'path'
-exec = require('child_process').exec
+process = require '../process'
 
 module.exports = (settings) ->
     # Validation
@@ -17,82 +16,23 @@ module.exports = (settings) ->
     shell.on 'exit', () ->
         http.kill() if shell.isShell and not settings.detach and http
     shell.cmd 'http start', 'Start HTTP server', (req, res, next) ->
-        args = []
-        detached = not shell.isShell or settings.detach
-        pipeStdout = settings.stdout and not detached
-        pipeStderr = settings.stderr and not detached
-        #args.push '-w'
-        #args.push settings.workspace
-        if not pipeStdout
-            args.push '>'
-            args.push settings.stdout
-        if not pipeStderr
-            args.push '2>'
-            args.push settings.stderr
         if path.existsSync settings.workspace + '/server.js'
-            args.unshift 'node ' + settings.workspace + '/server'
+            cmd = 'node ' + settings.workspace + '/server'
         else if path.existsSync settings.workspace + '/server.coffee'
-            args.unshift 'coffee ' + settings.workspace + '/server.coffee'
+            cmd = 'coffee ' + settings.workspace + '/server.coffee'
         else if path.existsSync settings.workspace + '/app.js'
-            args.unshift 'node ' + settings.workspace + '/app'
+            cmd = 'node ' + settings.workspace + '/app'
         else if path.existsSync settings.workspace + '/app.coffee'
-            args.unshift 'coffee ' + settings.workspace + '/app.coffee'
+            cmd = 'coffee ' + settings.workspace + '/app.coffee'
         else
             next new Error 'Failed to discover a "server.js" or "app.js" file'
-        args = args.join ' '
-        http = exec args
-        #done = false
-        #interval = setInterval ->
-            #console.log done
-            #clearInterval interval if done
-        #, 100
-        http.on 'exit', (code) ->
-            if   code is 0
-            then res.cyan settings.message_start
-            else res.red 'Error while starting HTTP server'
-            fs.unlinkSync pidfile if path.existsSync pidfile
+        http = process.start shell, settings, cmd, (err) ->
+            message = "HTTP server started"
+            res.cyan( message ).ln()
             res.prompt()
-            #done = true
-        if pipeStdout
-            http.stdout.pipe(
-                if   typeof settings.stdout is 'string'
-                then fs.createWriteStream settings.stdout
-                else settings.stdout
-            )
-        if pipeStderr
-            http.stderr.pipe(
-                if   typeof settings.stderr is 'string'
-                else fs.createWriteStream settings.stderr
-                then settings.stderr
-            )
-        if detached
-            pidfile = settings.pidfile or '/tmp/http.pid'
-            fs.writeFileSync pidfile, '' + http.pid
-        setTimeout ->
-            res.cyan('HTTP server started').ln() if http
-            res.prompt()
-        , 500
     shell.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->
-        if not shell.isShell or settings.detach
-            pidfile = settings.pidfile or '/tmp/http.pid'
-            pid = fs.readFileSync pidfile
-            cmds = []
-            cmds.push "for i in `ps -ef| awk '$3 == '#{pid}' { print $2 }'` ; do kill $i ; done"
-            cmds.push "kill #{pid}"
-            cmds = cmds.join ' && '
-            http = exec(cmds)
-            http.on 'exit', (code) ->
-                if   code is 0
-                then res.cyan settings.message_stop
-                else res.red 'Error while stoping HTTP server'
-                fs.unlinkSync pidfile
-                res.prompt()
-        else if http
-            http.on 'exit', (code) ->
-                http = null
-                res.cyan settings.message_stop
-                res.prompt()
-            http.kill()
-        else
-            console.log 'this should not appear'
+        process.stop settings, http, (err, success) ->
+            if success
+            then res.cyan('HTTP server successfully stoped').ln()
+            else res.magenta('HTTP server was not started').ln()
             res.prompt()
