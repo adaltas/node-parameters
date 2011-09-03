@@ -30,7 +30,6 @@ module.exports = class Shell extends EventEmitter
         @set 'command', @settings.command ? process.argv.slice(2).join(' ')
         @stack = []
         @styles = styles {stdout: @settings.stdout}
-        @interface = readline.createInterface @settings.stdin, @settings.stdout
         process.on 'exit', =>
             @emit('exit')
         process.on 'uncaughtException', (e) =>
@@ -40,6 +39,8 @@ module.exports = class Shell extends EventEmitter
             console.error e.stack
             process.exit()
         @isShell = this.settings.isShell ? process.argv.length is 2
+        if @isShell
+            @interface = readline.createInterface @settings.stdin, @settings.stdout
         # Project root directory
         @project_dir = @settings.project_dir
         unless @project_dir
@@ -121,9 +122,10 @@ module.exports = class Shell extends EventEmitter
             @interface.question @styles.raw( @settings.prompt, {color: 'green'}), @run.bind(@)
         else
             @styles.ln()
-            @settings.stdout.destroySoon();
-            @settings.stdout.on 'close', ->
-                process.exit()
+            #@settings.stdout.destroySoon();
+            #@settings.stdout.on 'close', ->
+                #process.exit()
+                #console.log 'done'
     
     # Command quit
     quit: (params) ->

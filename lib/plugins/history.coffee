@@ -11,12 +11,11 @@ module.exports = (settings) ->
     return if not settings.shell.isShell
     # Persist readline history
     # Default to ~/.node_shell/{md5(workspace)}
-    createDir = not settings.historyFile and not path.existsSync process.env['HOME'] + '/.node_shell'
+    dir = process.env['HOME'] + '/.node_shell'
+    file = crypto.createHash('md5').update(settings.shell.project_dir).digest('hex')
+    createDir = not settings.historyFile and not path.existsSync dir
     fs.mkdirSync process.env['HOME'] + '/.node_shell', 0700 if createDir
-    settings.historyFile ?=
-        process.env['HOME'] + 
-        '/.node_shell/' + 
-        crypto.createHash('md5').update(settings.shell.project_dir).digest('hex')
+    settings.historyFile ?= "#{dir}/#{file}"
     if path.existsSync settings.historyFile
         try
             json = fs.readFileSync(settings.historyFile, 'utf8') or '[]'
