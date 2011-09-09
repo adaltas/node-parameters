@@ -85,6 +85,7 @@ Shell settings may be set by calling `app.set('key', value)` and may be retrieve
 
 -   *env*, the running environment, default to the `env` setting or `NODE_ENV` if defined.
 -   *isShell*, detect wether the command is runned inside a shell are as a single command.
+-   *noPrompt*, do not prompt the user for a command, usefull to plug your own starting mechanisme.
 -   *project_dir*, return the project root directory path or null if node was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
 
 ## Shell events

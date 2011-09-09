@@ -52,7 +52,7 @@ module.exports = class Shell extends EventEmitter
         # Start
         process.nextTick =>
             if @isShell
-                @prompt()
+                @prompt() unless @set 'noPrompt'
             else
                 command = @set 'command'
                 @run command
