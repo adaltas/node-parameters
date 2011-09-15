@@ -70,7 +70,7 @@ The project brings a Connect/Express inspired API and similar functionnalities t
 
 The constructor `shell` take an optional object. Options are:
 
--    `env`   , defined the running environment
+-   `env`   , Running environment (eg: `production`, `develepment`)
 -	`prompt`, Character for command prompt, Defaults to ">>"
 -   `stdin` , Source to read from
 -   `stdout`, Destination to write to
@@ -91,10 +91,10 @@ Shell settings may be set by calling `app.set('key', value)`.  They can be retri
     });
 ```
 
--   `env`, the running environment, Defaults to the `env` setting (or `NODE_ENV` if defined).
--   `isShell`, detect whether the command is runned inside a shell are as a single command.
--   `noPrompt`, do not prompt the user for a command, usefull to plug your own starting mechanisme (eg: starting with a question).
--   `project_dir`, return the project root directory path or null if node was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
+-   `env`        , Running environment, Defaults to the `env` setting (or `NODE_ENV` if defined).
+-   `isShell`    , Detect whether the command is runned inside a shell are as a single command.
+-   `noPrompt`   , Do not prompt the user for a command, usefull to plug your own starting mechanisme (eg: starting with a question).
+-   `project_dir`, Project root directory or null if none was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
 
 ## Shell events
 
@@ -148,8 +148,9 @@ New routes are defined with the `cmd` method. A route is made of pattern against
 
 The request object contains the following properties:
 
+-   `shell`, reference the current shell application
 -   `command`, command entered by the user
--   `params`, parameters object extracted from the command
+-   `params`, parameters object extracted from the command, defined by the `shell.router` middleware
 
 The response object inherits from styles containing various utilities for printing, coloring and bolding.
 
@@ -177,17 +178,26 @@ Additionnaly, a new `shell.help()` function is made available. Options passed du
 
 ## HTTP server
 
-Register two commands, `http start` and `http stop`. The start command will search for "./server.js" and "./app.js" to run by `node`.
-    
+Register two commands, `http start` and `http stop`. The start command will search for "./server.js" and "./app.js" (and additionnaly their CoffeeScript alternatives) to run by `node`.The following properties may be provided as settings:
+
+-	`shell`    , (required) A reference to your shell application.
+-	`config`   , Path to the configuration file. Required to launch redis.
+-	`detach`   , Wether the HTTP process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
+-	`pidfile`  , Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-	`stdout`   , Writable stream or file path to redirect the server stdout.
+-	`stderr`   , Writable stream or file path to redirect the server stderr.
+-	`workspace`, Project directory used to resolve relative paths and search for "server" and "app" scripts.
+
+Example:
+
 ```javascript
     var app = new shell();
     app.configure(function() {
         app.use(shell.router({
             shell: app
         }));
-        app.use(shell.redis({
-            shell: app,
-            config: __dirname+'/redis.conf')
+        app.use(shell.http({
+            shell: app
         }));
         app.use(shell.help({
             shell: app,
@@ -202,8 +212,8 @@ Register two commands, `redis start` and `redis stop`. The following properties 
 
 -	`shell` (required)  a reference to your shell application.
 -	`config` Path to the configuration file. Required to launch redis.
--	`detach` Preserve the Cloud9 process when exiting the shell, only apply in shell mode.
--	`pidfile` Path to the file storing the process id, apply in command mode or in shell if option `detach` is `true`. Defaults to "/tmp/cloud9.pid"
+-	`detach` Wether the Redis process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
+-	`pidfile` Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
 -	`stdout` Writable stream or file path to redirect cloud9 stdout.
 -	`stderr` Writable stream or file path to redirect cloud9 stderr.
 
@@ -234,14 +244,14 @@ Options:
 
 -	`shell` (required)  a reference to your shell application.
 -	`config` Load the configuration from a config file. Overrides command-line options. Defaults to `null`.
--	`pidfile` Path to the file storing the process id, apply in command mode or in shell if option `detach` is `true`. Defaults to `"/tmp/cloud9.pid"`.
 -	`group` Run child processes with a specific group.
 -	`user` Run child processes as a specific user.
 -	`action` Define an action to execute after the Cloud9 server is started. Defaults to `null`.
 -	`ip` IP address where Cloud9 will serve from. Defaults to `"127.0.0.1"`.
 -	`port` Port number where Cloud9 will serve from. Defaults to `3000`.
 -	`workspace` Path to the workspace that will be loaded in Cloud9, Defaults to `Shell.set('project_dir')`.
--	`detach` Preserve the Cloud9 process when exiting the shell. Only applies in shell mode.
+-	`detach` Wether the Cloud9 process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
+-	`pidfile` Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
 -	`stdout` Writable stream or file path to redirect cloud9 stdout.
 -	`stderr` Writable stream or file path to redirect cloud9 stderr.
 
@@ -286,7 +296,8 @@ Options:
 -	`output` Directory where compiled JavaScript files are written. Used in conjunction with "compile".
 -	`lint` If the `jsl` (JavaScript Lint) command is installed, use it to check the compilation of a CoffeeScript file.
 -	`require` Load a library before compiling or executing your script. Can be used to hook in to the compiler (to add Growl notifications, for example).
--	`detach` Preserve the CoffeeScript process when exiting the shell. Only applies in shell mode.
+-	`detach` Wether the Coffee process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
+-	`pidfile` Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
 -	`stdout` Writable stream or file path to redirect cloud9 stdout.
 -	`stderr` Writable stream or file path to redirect cloud9 stderr.
 -	`workspace` Project directory used to resolve relative paths.
