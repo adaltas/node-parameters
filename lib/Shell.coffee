@@ -127,10 +127,9 @@ module.exports = class Shell extends EventEmitter
             @interface.question @styles.raw( @settings.prompt, {color: 'green'}), @run.bind(@)
         else
             @styles.ln()
-            #@settings.stdout.destroySoon();
-            #@settings.stdout.on 'close', ->
-                #process.exit()
-                #console.log 'done'
+            @settings.stdout.destroySoon();
+            @settings.stdout.on 'close', ->
+                process.exit()
     
     # Command quit
     quit: (params) ->
