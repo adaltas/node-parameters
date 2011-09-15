@@ -8,11 +8,8 @@ module.exports = (settings = {}) ->
     # Default settings
     settings.workspace ?= shell.project_dir
     throw new Error 'No workspace provided' if not settings.workspace
-    cloud9 = null
-    # Register commands
-    shell.cmd 'cloud9 start', 'Start Cloud9', (req, res, next) ->
+    cmd = () ->
         args = []
-        detached = not shell.isShell or settings.detach
         args.push '-w'
         args.push settings.workspace
         # Arguments
@@ -35,15 +32,18 @@ module.exports = (settings = {}) ->
             args.push '-p'
             args.push settings.port
         cmd = 'cloud9 ' + args.join(' ')
+    cloud9 = null
+    # Register commands
+    shell.cmd 'cloud9 start', 'Start Cloud9', (req, res, next) ->
         # Launch process
-        cloud9 = process.start shell, settings, cmd, (err) ->
+        cloud9 = process.start shell, settings, cmd(), (err) ->
             ip = settings.ip or '127.0.0.1'
             port = settings.port or 3000
             message = "Cloud9 started http://#{ip}:#{port}"
             res.cyan( message ).ln()
             res.prompt()
     shell.cmd 'cloud9 stop', 'Stop Cloud9', (req, res, next) ->
-        process.stop settings, cloud9, (err, success) ->
+        process.stop shell, settings, cloud9 or cmd(), (err, success) ->
             if success
             then res.cyan('Cloud9 successfully stoped').ln()
             else res.magenta('Cloud9 was not started').ln()

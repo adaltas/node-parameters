@@ -20,10 +20,8 @@ module.exports = (settings = {}) ->
     settings.workspace ?= shell.project_dir
     throw new Error 'No workspace provided' if not settings.workspace
     coffee = null
-    # Register commands
-    shell.cmd 'coffee start', 'Start CoffeeScript', (req, res, next) ->
+    cmd = () ->
         args = []
-        detached = not shell.isShell or settings.detach
         # Before compiling, concatenate all scripts together in the
         # order they were passed, and write them into the specified
         # file. Useful for building large projects.
@@ -60,14 +58,16 @@ module.exports = (settings = {}) ->
             args.push '-c'
             args.push enrichFiles(settings.compile)
         cmd = 'coffee ' + args.join(' ')
-        coffee = process.start shell, settings, cmd, (err) ->
+    # Register commands
+    shell.cmd 'coffee start', 'Start CoffeeScript', (req, res, next) ->
+        coffee = process.start shell, settings, cmd(), (err) ->
             ip = settings.ip or '127.0.0.1'
             port = settings.port or 3000
             message = "CoffeeScript started"
             res.cyan( message ).ln()
             res.prompt()
     shell.cmd 'coffee stop', 'Stop CoffeeScript', (req, res, next) ->
-        process.stop settings, coffee, (err, success) ->
+        process.stop shell, settings, coffee or cmd(), (err, success) ->
             if success
             then res.cyan('CoffeeScript successfully stoped').ln()
             else res.magenta('CoffeeScript was not started').ln()

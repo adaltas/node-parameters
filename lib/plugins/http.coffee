@@ -11,11 +11,7 @@ module.exports = (settings) ->
     throw new Error 'No workspace provided' if not settings.workspace
     settings.message_start ?= 'HTTP server successfully started'
     settings.message_stop ?= 'HTTP server successfully stopped'
-    # Register commands
-    http = null
-    shell.on 'exit', () ->
-        http.kill() if shell.isShell and not settings.detach and http
-    shell.cmd 'http start', 'Start HTTP server', (req, res, next) ->
+    cmd = () ->
         if path.existsSync settings.workspace + '/server.js'
             cmd = 'node ' + settings.workspace + '/server'
         else if path.existsSync settings.workspace + '/server.coffee'
@@ -25,13 +21,16 @@ module.exports = (settings) ->
         else if path.existsSync settings.workspace + '/app.coffee'
             cmd = 'coffee ' + settings.workspace + '/app.coffee'
         else
-            next new Error 'Failed to discover a "server.js" or "app.js" file'
-        http = process.start shell, settings, cmd, (err) ->
+            throw new Error 'Failed to discover a "server.js" or "app.js" file'
+    # Register commands
+    http = null
+    shell.cmd 'http start', 'Start HTTP server', (req, res, next) ->
+        http = process.start shell, settings, cmd(), (err) ->
             message = "HTTP server started"
             res.cyan( message ).ln()
             res.prompt()
     shell.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->
-        process.stop settings, http, (err, success) ->
+        process.stop shell, settings, http or cmd(), (err, success) ->
             if success
             then res.cyan('HTTP server successfully stoped').ln()
             else res.magenta('HTTP server was not started').ln()
