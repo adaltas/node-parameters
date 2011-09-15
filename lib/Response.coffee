@@ -2,13 +2,10 @@
 styles = require './Styles'
 utils = require './utils'
 
-module.exports = Response = (settings) ->
-    this.shell = settings.shell
-    styles.apply this, arguments
-
-Response.prototype.__proto__ = styles.prototype
-
-Response.prototype.pad = utils.pad
-
-Response.prototype.prompt = ->
-    this.shell.prompt()
+module.exports = class Response extends styles
+    constructor: (settings) ->
+        @shell = settings.shell
+        super settings
+    pad: utils.pad
+    prompt: ->
+        @shell.prompt()
