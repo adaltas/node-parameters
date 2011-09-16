@@ -9,3 +9,4 @@ module.exports = class Response extends styles
     pad: utils.pad
     prompt: ->
         @shell.prompt()
+        

@@ -39,8 +39,7 @@ module.exports = class Shell extends EventEmitter
             console.error e.stack
             process.exit()
         @isShell = this.settings.isShell ? process.argv.length is 2
-        if @isShell
-            @interface = readline.createInterface @settings.stdin, @settings.stdout
+        @interface() if @isShell
         # Project root directory
         @project_dir = @settings.project_dir
         unless @project_dir
@@ -62,6 +61,11 @@ module.exports = class Shell extends EventEmitter
                 command = @set 'command'
                 @run command
         return @
+    
+    # Return the readline interface and create it if not yet initialized
+    interface: () ->
+        return @_interface if @_interface?
+        @_interface = readline.createInterface @settings.stdin, @settings.stdout
     
     # Configure callback for the given `env`
     configure: (env, fn) ->
@@ -124,12 +128,46 @@ module.exports = class Shell extends EventEmitter
     # Display prompt
     prompt: ->
         if @isShell
-            @interface.question @styles.raw( @settings.prompt, {color: 'green'}), @run.bind(@)
+            @interface().question @styles.raw( @settings.prompt, {color: 'green'}), @run.bind(@)
         else
             @styles.ln()
             @settings.stdout.destroySoon();
             @settings.stdout.on 'close', ->
                 process.exit()
+    
+    # Ask one or more questions
+    question: (questions, callback) ->
+        isArray = Array.isArray questions
+        answers = []
+        index = 0
+        next = =>
+            question = questions[index]
+            @interface().question "#{question.name} [#{question.value}]", (answer) ->
+                answers[question.name] = if answer is '' then question.value else answer
+                unless ++index is questions.length
+                then next index
+                else callback if isArray then answers else answers[questions[0].name]
+        next()
+    
+    # Ask a question with a boolean answer
+    confirm: (msg, defaultTrue, callback) ->
+        args = arguments
+        unless callback
+            callback = defaultTrue
+            defaultTrue = true
+        @settings.key_true ?= 'y'
+        @settings.key_false ?= 'n'
+        key_true = @settings.key_true.toLowerCase() 
+        key_false = @settings.key_false.toLowerCase() 
+        keyTrue  = if defaultTrue then key_true.toUpperCase()  else key_true
+        keyFalse = if defaultTrue then key_false else key_false.toUpperCase()
+        msg += " [#{keyTrue}#{keyFalse}]"
+        @interface().question @styles.raw( msg, {color: 'green'}), (answer) =>
+            accepted = ['', key_true, key_false]
+            answer = answer.toLowerCase()
+            valid = accepted.indexOf(answer) isnt -1
+            return @confirm.apply(@, args) unless valid
+            callback answer is key_true or (defaultTrue and answer is '')
     
     # Command quit
     quit: (params) ->

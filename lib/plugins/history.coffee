@@ -19,7 +19,7 @@ module.exports = (settings) ->
     if path.existsSync settings.historyFile
         try
             json = fs.readFileSync(settings.historyFile, 'utf8') or '[]'
-            settings.shell.interface.history = JSON.parse json
+            settings.shell.interface().history = JSON.parse json
         catch e
             settings.shell.styles.red('Corrupted history file').ln()
     historyStream = fs.createWriteStream settings.historyFile, {flag: 'w'}

@@ -5,7 +5,7 @@ module.exports = (settings) ->
     shell = settings.shell
     # Plug completer to interface
     return unless shell.isShell
-    shell.interface.completer = (text) ->
+    shell.interface().completer = (text) ->
         suggestions = []
         routes = shell.routes
         for route in routes
