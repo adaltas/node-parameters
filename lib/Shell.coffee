@@ -5,6 +5,7 @@ path = require 'path'
 readline = require 'readline'
 events = require 'events'
 EventEmitter = events.EventEmitter
+each = require 'each'
 styles = require './Styles'
 Request = require './Request'
 Response = require './Response'
@@ -137,17 +138,28 @@ module.exports = class Shell extends EventEmitter
     
     # Ask one or more questions
     question: (questions, callback) ->
-        isArray = Array.isArray questions
-        answers = []
-        index = 0
-        next = =>
-            question = questions[index]
-            @interface().question "#{question.name} [#{question.value}]", (answer) ->
-                answers[question.name] = if answer is '' then question.value else answer
-                unless ++index is questions.length
-                then next index
-                else callback if isArray then answers else answers[questions[0].name]
-        next()
+        isObject = questions? and typeof questions is 'object'
+        answers = {}
+        if isObject
+            answers = []
+            each questions, (question, settings, next) =>
+                unless next
+                    return callback answers
+                settings = {value: settings} unless settings and typeof settings is 'object'
+                @interface().question "#{question} [#{settings.value}]", (answer) ->
+                    answers[question] = if answer is '' then settings.value else answer
+                    next()
+        else
+            isArray = Array.isArray questions
+            questions = [name: questions, value: ''] if typeof questions is 'string'
+            each questions, (question, next) =>
+                if next is null
+                    answers = answers[questions[0].name] unless isArray
+                    return callback answers
+                @interface().question "#{question.name} [#{question.value}]", (answer) ->
+                    answers[question.name] = if answer is '' then question.value else answer
+                    next()
+            
     
     # Ask a question with a boolean answer
     confirm: (msg, defaultTrue, callback) ->
