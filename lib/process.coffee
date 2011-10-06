@@ -27,7 +27,6 @@ module.exports.start = (shell, settings, cmd, callback) ->
             [code, pid] = stdout.split(' ')
             return callback new Error "Process exit with code #{code}" if code isnt '0'
             pidfile = settings.pidfile or pidfile cmd
-            console.log 'pidfile', pidfile
             fs.writeFileSync pidfile, '' + pid
             callback null, pid
     else # Kill child on exit if started in attached mode
