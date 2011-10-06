@@ -94,7 +94,7 @@ Shell settings may be set by calling `app.set('key', value)`.  They can be retri
 -   `env`        , Running environment, Defaults to the `env` setting (or `NODE_ENV` if defined).
 -   `isShell`    , Detect whether the command is runned inside a shell are as a single command.
 -   `noPrompt`   , Do not prompt the user for a command, usefull to plug your own starting mechanisme (eg: starting with a question).
--   `workspace`, Project root directory or null if none was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
+-   `workspace`  , Project root directory or null if none was found. The discovery strategy start from the current working directory and traverse each parent dir looking for a `node_module` directory or a `package.json` file.
 
 ## Shell events
 
@@ -108,8 +108,8 @@ By extending `EventEmitter`, the following events are emitted:
 
 The functionalities are a full transcription of the ones present Express. Options passed during creation are:
 
--   `shell` (required)
--	`sensitive` (optional) Defaults to `false`, set to `true` if the match should be case sensitive.
+-   `shell`     , (required) A reference to your shell application.
+-	`sensitive` , (optional) Defaults to `false`, set to `true` if the match should be case sensitive.
 
 New routes are defined with the `cmd` method. A route is made of pattern against which the user command is matched, an optional description and one or more route specific middlewares to handle the command. The pattern is either a string or a regular expression. Middlewares receive three parameters: a request object, a response object, and a function. Command parameters are substituted and made available in the `params` object of the request parameter.
 
@@ -148,9 +148,9 @@ New routes are defined with the `cmd` method. A route is made of pattern against
 
 The request object contains the following properties:
 
--   `shell`, reference the current shell application
--   `command`, command entered by the user
--   `params`, parameters object extracted from the command, defined by the `shell.router` middleware
+-   `shell`   , (required) A reference to your shell application.
+-   `command` , Command entered by the user
+-   `params`  , parameters object extracted from the command, defined by the `shell.router` middleware
 
 The response object inherits from styles containing various utilities for printing, coloring and bolding.
 
@@ -158,14 +158,15 @@ The response object inherits from styles containing various utilities for printi
 
 Persistent command history over multiple sessions. Options passed during creation are:
 
--   `shell`, required
--	`historyFile` Defaults to `process.cwd()+'/.node_shell'`
+-   `shell` , (required) A reference to your shell application.
+-   `name`  , Identify your project history file, default to the hash of the exectuted file
+-	`dir`   , Location of the history files, defaults to `"#{process.env['HOME']}/.node_shell"`
 
 ## Completer plugin
 
 Provides tab completion. Options passed during creation are:
 
--	`shell` required
+-	`shell` , (required) A reference to your shell application.
 
 ## Help plugin
 
@@ -173,8 +174,8 @@ Display help when the user types "help" or runs commands without arguments. Comm
 
 Additionnaly, a new `shell.help()` function is made available. Options passed during creation are:
 
--	`shell` required
--	`introduction` Print message 'Type "help" or press enter for a list of commands' if boolean `true`, or a custom message if a `string`
+-	`shell`        , (required) A reference to your shell application.
+-	`introduction` , Print message 'Type "help" or press enter for a list of commands' if boolean `true`, or a custom message if a `string`
 
 ## HTTP server
 
