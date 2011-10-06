@@ -31,7 +31,7 @@ module.exports = (settings = {}) ->
         if settings.port
             args.push '-p'
             args.push settings.port
-        cmd = 'cloud9 ' + args.join(' ')
+        "cloud9 #{args.join(' ')}"
     cloud9 = null
     # Register commands
     shell.cmd 'cloud9 start', 'Start Cloud9', (req, res, next) ->

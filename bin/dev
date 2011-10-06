@@ -4,7 +4,7 @@ process.chdir __dirname + '/../'
 
 shell = require 'shell'
 
-app = shell()
+app = module.exports = shell()
 
 app.configure ->
     app.use shell.history
