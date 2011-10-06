@@ -7,7 +7,7 @@ module.exports = (settings) ->
     throw new Error 'No shell provided' if not settings.shell
     shell = settings.shell
     # Default settings
-    settings.workspace ?= shell.project_dir;
+    settings.workspace ?= shell.set 'workspace'
     throw new Error 'No workspace provided' if not settings.workspace
     settings.message_start ?= 'HTTP server successfully started'
     settings.message_stop ?= 'HTTP server successfully stopped'

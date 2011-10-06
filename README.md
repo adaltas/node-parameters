@@ -94,7 +94,7 @@ Shell settings may be set by calling `app.set('key', value)`.  They can be retri
 -   `env`        , Running environment, Defaults to the `env` setting (or `NODE_ENV` if defined).
 -   `isShell`    , Detect whether the command is runned inside a shell are as a single command.
 -   `noPrompt`   , Do not prompt the user for a command, usefull to plug your own starting mechanisme (eg: starting with a question).
--   `project_dir`, Project root directory or null if none was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
+-   `workspace`, Project root directory or null if none was found. The discovery strategy start from the current directory and traverse each parent dir looking for a a node_module dir or a package.json file.
 
 ## Shell events
 
@@ -249,7 +249,7 @@ Options:
 -	`action` Define an action to execute after the Cloud9 server is started. Defaults to `null`.
 -	`ip` IP address where Cloud9 will serve from. Defaults to `"127.0.0.1"`.
 -	`port` Port number where Cloud9 will serve from. Defaults to `3000`.
--	`workspace` Path to the workspace that will be loaded in Cloud9, Defaults to `Shell.set('project_dir')`.
+-	`workspace` Path to the workspace that will be loaded in Cloud9, Defaults to `Shell.set('workspace')`.
 -	`detach` Wether the Cloud9 process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
 -	`pidfile` Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
 -	`stdout` Writable stream or file path to redirect cloud9 stdout.
@@ -319,3 +319,22 @@ Example:
         }));
     });
 ```
+
+## Prompt route
+
+The prompt route is a convenient function to stop command once a few routes are executed. You can simply pass the the `shell.routes.prompt` function or call it with a message argument.
+
+```javascript
+    var app = new shell();
+    app.configure(function() {
+        app.use(shell.router({
+            shell: app
+        }));
+    });
+    app.cmd('Install', [
+    	my_app.routes.download,
+    	my_app.routes.configure,
+    	my_app.routes.initialize
+    ], shell.routes.prompt('Installation is finished'));
+```
+

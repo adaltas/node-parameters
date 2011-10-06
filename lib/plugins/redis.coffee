@@ -7,7 +7,7 @@ module.exports = (settings) ->
     throw new Error 'No path to the Redis configuration file' unless settings.config
     shell = settings.shell
     # Default settings
-    settings.workspace ?= shell.project_dir
+    settings.workspace ?= shell.set 'workspace'
     cmd = () ->
         "redis-server #{settings.config}"
     # Register commands

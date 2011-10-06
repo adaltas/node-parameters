@@ -18,6 +18,8 @@ Shell.test = require('./lib/plugins/test');
 
 // Routes
 Shell.routes = {
+    confirm: require('./lib/routes/confirm'),
+    prompt: require('./lib/routes/prompt'),
     shellOnly: require('./lib/routes/shellOnly')
 };
 

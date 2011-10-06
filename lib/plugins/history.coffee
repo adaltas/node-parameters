@@ -7,14 +7,15 @@ Interface = require('readline').Interface
 module.exports = (settings) ->
     # Validation
     throw new Error 'No shell provided' if not settings.shell
+    shell = settings.shell
     # Only in shell mode
     return if not settings.shell.isShell
     # Persist readline history
     # Default to ~/.node_shell/{md5(workspace)}
     dir = process.env['HOME'] + '/.node_shell'
-    file = crypto.createHash('md5').update(settings.shell.project_dir).digest('hex')
+    file = crypto.createHash('md5').update(shell.set 'workspace').digest('hex')
     createDir = not settings.historyFile and not path.existsSync dir
-    fs.mkdirSync process.env['HOME'] + '/.node_shell', 0700 if createDir
+    fs.mkdirSync dir, 0700 if createDir
     settings.historyFile ?= "#{dir}/#{file}"
     if path.existsSync settings.historyFile
         try

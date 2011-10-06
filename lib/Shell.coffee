@@ -42,12 +42,11 @@ module.exports = class Shell extends EventEmitter
         @isShell = this.settings.isShell ? process.argv.length is 2
         @interface() if @isShell
         # Project root directory
-        @project_dir = @settings.project_dir
-        unless @project_dir
+        unless settings.workspace
             dirs = mod._nodeModulePaths process.cwd()
             for dir in dirs
                 if path.existsSync(dir) || path.existsSync(path.normalize(dir + '/../package.json'))
-                    @project_dir = path.normalize dir + '/..'
+                    @set 'workspace', path.normalize dir + '/..'
                     break
         # Start
         process.nextTick =>
