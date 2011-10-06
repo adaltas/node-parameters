@@ -13,6 +13,7 @@
     "dependencies": {
         "coffee-script": "latest",
         "each": "latest",
+        "pad": "latest",
         "coffeekup": "latest"
     },
     "keywords": ["console", "colors", "xterm"],

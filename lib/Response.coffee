@@ -1,12 +1,12 @@
 
 styles = require './Styles'
-utils = require './utils'
+pad = require 'pad'
 
 module.exports = class Response extends styles
     constructor: (settings) ->
         @shell = settings.shell
         super settings
-    pad: utils.pad
+    pad: pad
     prompt: ->
         @shell.prompt()
         

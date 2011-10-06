@@ -1,5 +1,5 @@
 
-utils = require '../utils'
+pad = require 'pad'
 
 module.exports = (settings) ->
     # Validation
@@ -11,7 +11,7 @@ module.exports = (settings) ->
         res.ln()
         routes = shell.routes
         for route in routes
-            text = utils.pad route.command, 20
+            text = pad route.command, 20
             res
             .cyan(text)
             .white(route.description)

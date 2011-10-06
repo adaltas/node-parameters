@@ -2,13 +2,6 @@
 path = require 'path'
 
 module.exports =
-    pad: (n, size) ->
-        n = n.toString()
-        pad = ''
-        size = size - n.length
-        for i in [0 .. size]
-            pad += ' '
-        n + pad
     flatten: (arr, ret) ->
         ret ?= []
         for i in [0 ... arr.length]
