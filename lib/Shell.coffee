@@ -1,11 +1,10 @@
 
 util = require 'util'
-mod = require 'module'
-path = require 'path'
 readline = require 'readline'
 events = require 'events'
 EventEmitter = events.EventEmitter
 each = require 'each'
+utils = require './utils'
 styles = require './Styles'
 Request = require './Request'
 Response = require './Response'
@@ -42,12 +41,7 @@ module.exports = class Shell extends EventEmitter
         @isShell = this.settings.isShell ? process.argv.length is 2
         @interface() if @isShell
         # Project root directory
-        unless settings.workspace
-            dirs = mod._nodeModulePaths process.cwd()
-            for dir in dirs
-                if path.existsSync(dir) || path.existsSync(path.normalize(dir + '/../package.json'))
-                    @set 'workspace', path.normalize dir + '/..'
-                    break
+        settings.workspace ?= utils.workspace()
         # Start
         process.nextTick =>
             if @isShell
