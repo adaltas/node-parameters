@@ -49,7 +49,7 @@ match = (req, routes, i) ->
     i ?= 0
     while i < routes.length
         route = routes[i]
-        fn = route.callback
+        #fn = route.callback
         regexp = route.regexp
         keys = route.keys
         captures = regexp.exec req.command
@@ -98,7 +98,6 @@ module.exports = router = (settings) ->
         route = {}
         route.command = args.shift()
         route.description = args.shift() if typeof args[0] is 'string'
-        route.callback = args.pop()
         route.middlewares = utils.flatten args
         keys = []
         route.regexp = 
@@ -158,11 +157,12 @@ module.exports = router = (settings) ->
                             else if fn
                                 fn req, res, nextMiddleware
                             else
-                                route.callback.call self, req, res, (err) ->
-                                    if err
-                                        next err
-                                    else
-                                        pass req._route_index + 1
+                                pass req._route_index + 1
+                                #route.callback.call self, req, res, (err) ->
+                                    #if err
+                                        #next err
+                                    #else
+                                        #pass req._route_index + 1
                         nextMiddleware()
                     # More params
                     else
