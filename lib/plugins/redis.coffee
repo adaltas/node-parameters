@@ -1,5 +1,5 @@
 
-process = require '../process'
+start_stop = require '../start_stop'
 
 module.exports = (settings) ->
     # Validation
@@ -13,15 +13,15 @@ module.exports = (settings) ->
     # Register commands
     redis = null
     shell.cmd 'redis start', 'Start Redis', (req, res, next) ->
-        # Launch process
-        redis = process.start shell, settings, cmd(), (err) ->
+        # Launch start_stop
+        redis = start_stop.start shell, settings, cmd(), (err) ->
             ip = settings.ip or '127.0.0.1'
             port = settings.port or 3000
             message = "Redis started"
             res.cyan( message ).ln()
             res.prompt()
     shell.cmd 'redis stop', 'Stop Redis', (req, res, next) ->
-        process.stop shell, settings, redis or cmd(), (err, success) ->
+        start_stop.stop shell, settings, redis or cmd(), (err, success) ->
             if success
             then res.cyan('Redis successfully stoped').ln()
             else res.magenta('Redis was not started').ln()

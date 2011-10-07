@@ -1,6 +1,6 @@
 
 path = require 'path'
-process = require '../process'
+start_stop = require '../start_stop'
 
 module.exports = (settings) ->
     # Validation
@@ -25,12 +25,12 @@ module.exports = (settings) ->
     # Register commands
     http = null
     shell.cmd 'http start', 'Start HTTP server', (req, res, next) ->
-        http = process.start shell, settings, cmd(), (err) ->
+        http = start_stop.start shell, settings, cmd(), (err) ->
             message = "HTTP server started"
             res.cyan( message ).ln()
             res.prompt()
     shell.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->
-        process.stop shell, settings, http or cmd(), (err, success) ->
+        start_stop.stop shell, settings, http or cmd(), (err, success) ->
             if success
             then res.cyan('HTTP server successfully stoped').ln()
             else res.magenta('HTTP server was not started').ln()

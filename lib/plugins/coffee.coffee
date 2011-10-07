@@ -1,5 +1,6 @@
 
 fs = require 'fs'
+start_stop = require '../start_stop'
 
 # Sanitize a list of files separated by spaces
 enrichFiles = (files) ->
@@ -60,14 +61,14 @@ module.exports = (settings = {}) ->
         cmd = 'coffee ' + args.join(' ')
     # Register commands
     shell.cmd 'coffee start', 'Start CoffeeScript', (req, res, next) ->
-        coffee = process.start shell, settings, cmd(), (err) ->
+        coffee = start_stop.start shell, settings, cmd(), (err) ->
             ip = settings.ip or '127.0.0.1'
             port = settings.port or 3000
             message = "CoffeeScript started"
             res.cyan( message ).ln()
             res.prompt()
     shell.cmd 'coffee stop', 'Stop CoffeeScript', (req, res, next) ->
-        process.stop shell, settings, coffee or cmd(), (err, success) ->
+        start_stop.stop shell, settings, coffee or cmd(), (err, success) ->
             if success
             then res.cyan('CoffeeScript successfully stoped').ln()
             else res.magenta('CoffeeScript was not started').ln()

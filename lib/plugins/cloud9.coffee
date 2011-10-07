@@ -1,5 +1,5 @@
 
-process = require '../process'
+start_stop = require '../start_stop'
 
 module.exports = (settings = {}) ->
     # Validation
@@ -35,15 +35,15 @@ module.exports = (settings = {}) ->
     cloud9 = null
     # Register commands
     shell.cmd 'cloud9 start', 'Start Cloud9', (req, res, next) ->
-        # Launch process
-        cloud9 = process.start shell, settings, cmd(), (err) ->
+        # Launch start_stop
+        cloud9 = start_stop.start shell, settings, cmd(), (err) ->
             ip = settings.ip or '127.0.0.1'
             port = settings.port or 3000
             message = "Cloud9 started http://#{ip}:#{port}"
             res.cyan( message ).ln()
             res.prompt()
     shell.cmd 'cloud9 stop', 'Stop Cloud9', (req, res, next) ->
-        process.stop shell, settings, cloud9 or cmd(), (err, success) ->
+        start_stop.stop shell, settings, cloud9 or cmd(), (err, success) ->
             if success
             then res.cyan('Cloud9 successfully stoped').ln()
             else res.magenta('Cloud9 was not started').ln()
