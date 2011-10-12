@@ -25,9 +25,10 @@ module.exports = (settings) ->
     # Register commands
     http = null
     shell.cmd 'http start', 'Start HTTP server', (req, res, next) ->
-        http = start_stop.start shell, settings, cmd(), (err) ->
-            message = "HTTP server started"
-            res.cyan( message ).ln()
+        http = start_stop.start shell, settings, cmd(), (err, pid) ->
+            return next err if err
+            return res.cyan('HTTP server already started').ln() unless pid
+            res.cyan( 'HTTP server started' ).ln()
             res.prompt()
     shell.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->
         start_stop.stop shell, settings, http or cmd(), (err, success) ->

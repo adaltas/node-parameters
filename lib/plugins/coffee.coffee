@@ -61,7 +61,9 @@ module.exports = (settings = {}) ->
         cmd = 'coffee ' + args.join(' ')
     # Register commands
     shell.cmd 'coffee start', 'Start CoffeeScript', (req, res, next) ->
-        coffee = start_stop.start shell, settings, cmd(), (err) ->
+        coffee = start_stop.start shell, settings, cmd(), (err, pid) ->
+            return next err if err
+            return res.cyan('Already Started').ln() unless pid
             ip = settings.ip or '127.0.0.1'
             port = settings.port or 3000
             message = "CoffeeScript started"

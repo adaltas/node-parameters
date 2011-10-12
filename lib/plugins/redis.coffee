@@ -13,12 +13,11 @@ module.exports = (settings) ->
     # Register commands
     redis = null
     shell.cmd 'redis start', 'Start Redis', (req, res, next) ->
-        # Launch start_stop
-        redis = start_stop.start shell, settings, cmd(), (err) ->
-            ip = settings.ip or '127.0.0.1'
-            port = settings.port or 3000
-            message = "Redis started"
-            res.cyan( message ).ln()
+        # Launch process
+        redis = start_stop.start shell, settings, cmd(), (err, pid) ->
+            return next err if err
+            return res.cyan('Redis already started').ln() unless pid
+            res.cyan('Redis started').ln()
             res.prompt()
     shell.cmd 'redis stop', 'Stop Redis', (req, res, next) ->
         start_stop.stop shell, settings, redis or cmd(), (err, success) ->

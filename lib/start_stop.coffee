@@ -21,14 +21,35 @@ module.exports.start = (shell, settings, cmd, callback) ->
     if detach
         cmdStdout = if typeof settings.stdout is 'string' then settings.stdout else '/dev/null'
         cmdStderr = if typeof settings.stderr is 'string' then settings.stderr else '/dev/null'
-        pipe = "</dev/null >#{cmdStdout} 2>#{cmdStdout}"
-        info = 'echo $? $!'
-        child = exec "#{cmd} #{pipe} & #{info}", (err, stdout, stderr) ->
-            [code, pid] = stdout.split(' ')
-            return callback new Error "Process exit with code #{code}" if code isnt '0'
-            pidfile = settings.pidfile or pidfile cmd
-            fs.writeFileSync pidfile, '' + pid
-            callback null, pid
+        pidfile = settings.pidfile or pidfile cmd
+        # return the pid if it match a live process
+        pidExists = (pid, callback) ->
+            exec "ps -ef | grep #{pid} | grep -v grep", (err, stdout, stderr) ->
+                return callback err if err and err.code isnt 1
+                return callback null, null if err
+                callback null, pid
+                #callback err
+        # return the pid if it can read it from the pidfile
+        pidRead = (callback) ->
+            path.exists pidfile, (exists) ->
+                return callback null, null unless exists
+                fs.readFile pidfile, (err, pid) ->
+                    return callback err if err
+                    pid = parseInt pid, 10
+                    callback null, pid
+        start = () ->
+            pipe = "</dev/null >#{cmdStdout} 2>#{cmdStdout}"
+            info = 'echo $? $!'
+            child = exec "#{cmd} #{pipe} & #{info}", (err, stdout, stderr) ->
+                [code, pid] = stdout.split(' ')
+                return callback new Error "Process exit with code #{code}" if code isnt '0'
+                fs.writeFileSync pidfile, '' + pid
+                callback null, pid
+        pidRead (err, pid) ->
+            return start() unless pid
+            pidExists pid, (err, pid) ->
+                return start() unless pid
+                callback null, false
     else # Kill child on exit if started in attached mode
         shell.on 'exit', -> child.kill()
         child = exec cmd
@@ -59,6 +80,7 @@ module.exports.stop = (shell, settings, cmdOrChild, callback) ->
         pidfile = settings.pidfile or pidfile cmdOrChild
         return callback null, false unless path.existsSync pidfile
         pid = fs.readFileSync pidfile, 'ascii'
+        pid = pid.trim()
         cmds = []
         cmds.push "for i in `ps -ef| awk '$3 == '#{pid}' { print $2 }'` ; do kill $i ; done"
         cmds.push "kill #{pid}"
