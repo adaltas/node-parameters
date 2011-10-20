@@ -1,6 +1,4 @@
 
-sys = require 'sys'
-
 colors =
     black: 30
     red: 31

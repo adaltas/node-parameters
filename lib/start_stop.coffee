@@ -78,18 +78,27 @@ module.exports.stop = (shell, settings, cmdOrChild, callback) ->
     detach = settings.detach ? not shell.isShell
     if detach
         pidfile = settings.pidfile or pidfile cmdOrChild
-        return callback null, false unless path.existsSync pidfile
-        pid = fs.readFileSync pidfile, 'ascii'
-        pid = pid.trim()
-        cmds = []
-        cmds.push "for i in `ps -ef| awk '$3 == '#{pid}' { print $2 }'` ; do kill $i ; done"
-        cmds.push "kill #{pid}"
-        cmds = cmds.join ' && '
-        child = exec(cmds)
-        child.on 'exit', (code) ->
-            return callback new Error "Unexpected exit code #{code}" unless code is 0
-            fs.unlinkSync pidfile
-            callback null, true
+        #return callback null, false unless path.existsSync pidfile
+        path.exists pidfile, (exists) ->
+            return callback null, false unless exists
+            pid = fs.readFileSync pidfile, 'ascii'
+            pid = pid.trim()
+            cmds = []
+            cmds.push "for i in `ps -ef| awk '$3 == '#{pid}' { print $2 }'` ; do kill $i ; done"
+            cmds.push "kill #{pid}"
+            cmds = cmds.join ' && '
+            child = exec cmds, (err, stdout, stderr) ->
+                if err and err.code is 1 and /No such process/.test(stderr)
+                    return fs.unlink pidfile, (err) ->
+                        return callback err if err
+                        return callback null, false
+                else if err
+                    return callback err
+                callback null, true
+            #child.on 'exit', (code) ->
+                #return callback new Error "Unexpected exit code #{code}" unless code is 0
+                #fs.unlinkSync pidfile
+                #callback null, true
     else
         pid = cmdOrChild.pid
         cmds = []

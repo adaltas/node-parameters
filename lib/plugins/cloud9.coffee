@@ -36,7 +36,7 @@ module.exports = (settings = {}) ->
     # Register commands
     shell.cmd 'cloud9 start', 'Start Cloud9', (req, res, next) ->
         # Launch process
-        cloud9 = process.start shell, settings, cmd(), (err, pid) ->
+        cloud9 = start_stop.start shell, settings, cmd(), (err, pid) ->
             return next err if err
             return res.cyan('Cloud9 already started').ln() unless pid
             ip = settings.ip or '127.0.0.1'
@@ -45,7 +45,7 @@ module.exports = (settings = {}) ->
             res.cyan( message ).ln()
             res.prompt()
     shell.cmd 'cloud9 stop', 'Stop Cloud9', (req, res, next) ->
-        process.stop shell, settings, cloud9 or cmd(), (err, success) ->
+        start_stop.stop shell, settings, cloud9 or cmd(), (err, success) ->
             if success
             then res.cyan('Cloud9 successfully stoped').ln()
             else res.magenta('Cloud9 was not started').ln()
