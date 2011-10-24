@@ -1,4 +1,3 @@
-
 colors =
     black: 30
     red: 31
@@ -85,6 +84,10 @@ Styles.prototype.ln = ->
 # Others
 
 Styles.prototype.raw = (text, settings) ->
+    //Colors (at least this way) dont work on the windows port
+    if process.platform == 'win32'
+        return text
+        
     raw = '';
     settings ?= {}
     if settings.color isnt null and ( settings.color or this.current.color )
