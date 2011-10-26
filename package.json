@@ -16,7 +16,7 @@
         "pad": "latest",
         "coffeekup": "latest"
     },
-    "keywords": ["console", "colors", "xterm"],
+    "keywords": ["cli", "console", "colors", "xterm"],
     "repository": {
         "type": "git",
         "url": "https://github.com/wdavidw/node-shell.git"
