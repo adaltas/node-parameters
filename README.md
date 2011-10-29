@@ -323,7 +323,7 @@ Example:
 
 ## Prompt route
 
-The prompt route is a convenient function to stop command once a few routes are executed. You can simply pass the the `shell.routes.prompt` function or call it with a message argument.
+The `prompt` route is a convenient function to stop command once a few routes are executed. You can simply pass the the `shell.routes.prompt` function or call it with a message argument.
 
 ```javascript
     var app = new shell();
@@ -332,10 +332,45 @@ The prompt route is a convenient function to stop command once a few routes are 
             shell: app
         }));
     });
-    app.cmd('Install', [
+    app.cmd('install', [
     	my_app.routes.download,
     	my_app.routes.configure,
-    	my_app.routes.initialize
-    ], shell.routes.prompt('Installation is finished'));
+        shell.routes.prompt('Installation is finished')
+    ]);
 ```
 
+## Confirm route
+
+The `confirm` route ask the user if he want to continue the process. If the answer is `true`, the following routes are executed. Otherwise, the process is stoped.
+
+```javascript
+    var app = new shell();
+    app.configure(function() {
+        app.use(shell.router({
+            shell: app
+        }));
+    });
+    app.cmd('install', [
+        shell.routes.confirm('Do you confirm?'),
+        my_app.routes.download,
+    	my_app.routes.configure
+    ]);
+```
+
+## Timeout route
+
+The `timeout` route will wait for the provided period (in millisenconds) before execution the following route.
+
+```javascript
+    var app = new shell();
+    app.configure(function() {
+        app.use(shell.router({
+            shell: app
+        }));
+    });
+    app.cmd('restart', [
+        my_app.routes.stop,
+        shell.routes.timeout(1000),
+        my_app.routes.start
+    ]);
+```

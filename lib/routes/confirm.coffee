@@ -4,4 +4,3 @@ module.exports = (message) ->
         req.confirm message, true, (confirmed) ->
             return res.prompt() unless confirmed
             next()
-    
