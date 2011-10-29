@@ -181,7 +181,6 @@ Additionnaly, a new `shell.help()` function is made available. Options passed du
 
 Register two commands, `http start` and `http stop`. The start command will search for "./server.js" and "./app.js" (and additionnaly their CoffeeScript alternatives) to run by `node`.The following properties may be provided as settings:
 
--	`shell`    , (required) A reference to your shell application.
 -	`config`   , Path to the configuration file. Required to launch redis.
 -	`detach`   , Wether the HTTP process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
 -	`pidfile`  , Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
@@ -211,7 +210,6 @@ Example:
 
 Register two commands, `redis start` and `redis stop`. The following properties may be provided as settings:
 
--	`shell` (required)  a reference to your shell application.
 -	`config` Path to the configuration file. Required to launch redis.
 -	`detach` Wether the Redis process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
 -	`pidfile` Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
@@ -243,7 +241,6 @@ Register two commands, `cloud9 start` and `cloud9 stop`. Unless provided, the Cl
 
 Options:
 
--	`shell` (required)  a reference to your shell application.
 -	`config` Load the configuration from a config file. Overrides command-line options. Defaults to `null`.
 -	`group` Run child processes with a specific group.
 -	`user` Run child processes as a specific user.
@@ -275,7 +272,7 @@ Example:
     });
 ```
 
-**Important:** cloud9 must be installed with npm—but there's a problem. Currently, the npm module is based on the master branch of cloud9 on GitHub (version "0.3.0"), and expects Node version 0.4.1. 
+**Important:** If you encounter issue while installing cloud9, it might be because the npm module expect an older version of Node. 
 
 Here's the procedure to use the newer version on the devel branch:
 
@@ -359,7 +356,7 @@ The `confirm` route ask the user if he want to continue the process. If the answ
 
 ## Timeout route
 
-The `timeout` route will wait for the provided period (in millisenconds) before execution the following route.
+The `timeout` route will wait for the provided period (in millisenconds) before executing the following route.
 
 ```javascript
     var app = new shell();

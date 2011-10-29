@@ -32,7 +32,7 @@ module.exports = (settings) ->
         for p in paths
             if path.existsSync p + '/expresso/bin/expresso'
                 return run p
-        res.magenta 'Expresso not found'
+        res.magenta('Expresso not found').ln()
         res.prompt()
     shell.cmd 'test :pattern', 'Run specific tests', (req, res, next) ->
         #todo

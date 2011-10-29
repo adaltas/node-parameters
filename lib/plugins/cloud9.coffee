@@ -2,12 +2,6 @@
 start_stop = require '../start_stop'
 
 module.exports = (settings = {}) ->
-    # Validation
-    throw new Error 'No shell provided' if not settings.shell
-    shell = settings.shell
-    # Default settings
-    settings.workspace ?= shell.set 'workspace'
-    throw new Error 'No workspace provided' if not settings.workspace
     cmd = () ->
         args = []
         args.push '-w'
@@ -33,21 +27,30 @@ module.exports = (settings = {}) ->
             args.push settings.port
         "cloud9 #{args.join(' ')}"
     cloud9 = null
-    # Register commands
-    shell.cmd 'cloud9 start', 'Start Cloud9', (req, res, next) ->
-        # Launch process
-        cloud9 = start_stop.start shell, settings, cmd(), (err, pid) ->
-            return next err if err
-            return res.cyan('Cloud9 already started').ln() unless pid
-            ip = settings.ip or '127.0.0.1'
-            port = settings.port or 3000
-            message = "Cloud9 started http://#{ip}:#{port}"
-            res.cyan( message ).ln()
-            res.prompt()
-    shell.cmd 'cloud9 stop', 'Stop Cloud9', (req, res, next) ->
-        start_stop.stop shell, settings, cloud9 or cmd(), (err, success) ->
-            if success
-            then res.cyan('Cloud9 successfully stoped').ln()
-            else res.magenta('Cloud9 was not started').ln()
-            res.prompt()
+    (req, res, next) ->
+        app = req.shell
+        # Caching
+        return next() if app.tmp.cloud9
+        app.tmp.cloud9 = true
+        # Workspace
+        settings.workspace ?= app.set 'workspace'
+        return next(new Error 'No workspace provided') unless settings.workspace
+        # Register commands
+        app.cmd 'cloud9 start', 'Start Cloud9', (req, res, next) ->
+            # Launch process
+            cloud9 = start_stop.start app, settings, cmd(), (err, pid) ->
+                return next err if err
+                return res.cyan('Cloud9 already started').ln() unless pid
+                ip = settings.ip or '127.0.0.1'
+                port = settings.port or 3000
+                message = "Cloud9 started http://#{ip}:#{port}"
+                res.cyan( message ).ln()
+                res.prompt()
+        app.cmd 'cloud9 stop', 'Stop Cloud9', (req, res, next) ->
+            start_stop.stop app, settings, cloud9 or cmd(), (err, success) ->
+                if success
+                then res.cyan('Cloud9 successfully stoped').ln()
+                else res.magenta('Cloud9 was not started').ln()
+                res.prompt()
+        next()
 

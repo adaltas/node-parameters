@@ -22,6 +22,7 @@ module.exports = class Shell extends EventEmitter
     constructor: (settings = {}) ->
         return new Shell(settings) if @ not instanceof Shell
         EventEmitter.call @
+        @tmp = {}
         @settings = settings
         @settings.prompt ?= '>> '
         @settings.stdin ?= process.stdin
