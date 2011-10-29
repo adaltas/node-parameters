@@ -2,7 +2,7 @@
 
     var spawn = require('child_process').spawn,
         shell = require('shell'),
-        app = new shell.Shell();
+        app = new shell();
         
     app.configure(function(){
         app.use(shell.router({shell: app}));

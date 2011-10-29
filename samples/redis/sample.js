@@ -10,16 +10,15 @@
         app.use(shell.history({
             shell: app
         }));
-        app.use(shell.router({
-            shell: app
-        }));
         app.use(shell.redis({
-            shell: app,
             config: 'redis.conf',
             stdout: 'redis.out.log',
             stderr: 'redis.err.log',
             pidfile: 'redis.pid',
             detach: true
+        }));
+        app.use(shell.router({
+            shell: app
         }));
         app.use(shell.help({
             shell: app,

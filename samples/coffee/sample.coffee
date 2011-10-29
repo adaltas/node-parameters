@@ -2,7 +2,7 @@
 
     shell = require 'shell'
     
-    app = new shell.Shell
+    app = new shell
         project_dir: __dirname
     
     app.configure ->

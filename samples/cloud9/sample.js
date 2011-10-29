@@ -2,7 +2,7 @@
 
     var shell = require('shell');
     
-    var app = new shell.Shell();
+    var app = shell();
     
     app.configure(function() {
         app.use(shell.history({
