@@ -68,33 +68,34 @@ The project brings a Connect/Express inspired API and similar functionnalities t
     });
 ```
 
+## Shell settings
+
 The constructor `shell` take an optional object. Options are:
 
--   `env`   , Running environment (eg: `production`, `develepment`)
--	`prompt`, Character for command prompt, Defaults to ">>"
--   `stdin` , Source to read from
--   `stdout`, Destination to write to
-
-As with Express, `app.configure` allows the customization of plugins for all or specific environments, while `app.use` registers plugins.
-
-If `app.configure` is called without specifying the environment as the first argument, the provided callback is always called. Otherwise, the environment must match the `env` setting or the global variable `NODE_ENV`.
-
-## Shell settings
+-   `chdir`      , Changes the current working directory of the process, a string of the directory, boolean true will default to the `workspace` (in which case `workspace` must be provided or discoverable)
+-   `prompt`     , Character for command prompt, Defaults to ">>"
+-   `stdin`      , Source to read from
+-   `stdout`     , Destination to write to
+-   `env`        , Running environment, Defaults to the `env` setting (or `NODE_ENV` if defined, eg: `production`, `develepment`).
+-   `isShell`    , Detect whether the command is runned inside a shell are as a single command.
+-   `noPrompt`   , Do not prompt the user for a command, usefull to plug your own starting mechanisme (eg: starting with a question).
+-   `workspace`  , Project root directory or null if none was found. The discovery strategy start from the current working directory and traverse each parent dir looking for a `node_module` directory or a `package.json` file.
 
 Shell settings may be set by calling `app.set('key', value)`.  They can be retrieved by calling the same function without a second argument.
 
 ```javascript
-    var app = new shell();
+    var app = new shell({
+        chdir: true
+    });
     app.set('env', 'prod');
     app.configure('prod', function() {
         console.log(app.set('env'));
     });
 ```
 
--   `env`        , Running environment, Defaults to the `env` setting (or `NODE_ENV` if defined).
--   `isShell`    , Detect whether the command is runned inside a shell are as a single command.
--   `noPrompt`   , Do not prompt the user for a command, usefull to plug your own starting mechanisme (eg: starting with a question).
--   `workspace`  , Project root directory or null if none was found. The discovery strategy start from the current working directory and traverse each parent dir looking for a `node_module` directory or a `package.json` file.
+As with Express, `app.configure` allows the customization of plugins for all or specific environments, while `app.use` registers plugins.
+
+If `app.configure` is called without specifying the environment as the first argument, the provided callback is always called. Otherwise, the environment must match the `env` setting or the global variable `NODE_ENV`.
 
 ## Shell events
 

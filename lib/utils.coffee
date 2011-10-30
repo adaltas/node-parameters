@@ -12,7 +12,8 @@ module.exports =
         ret
     # Discovery the project root directory or return null if undiscoverable
     workspace: () ->
-        dirs = require('module')._nodeModulePaths process.cwd()
+        #dirs = require('module')._nodeModulePaths process.cwd()
+        dirs = require('module')._nodeModulePaths process.argv[1]
         for dir in dirs
             if path.existsSync(dir) || path.existsSync(path.normalize(dir + '/../package.json'))
                 return path.normalize dir + '/..'

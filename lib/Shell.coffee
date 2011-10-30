@@ -43,6 +43,9 @@ module.exports = class Shell extends EventEmitter
         @interface() if @isShell
         # Project root directory
         settings.workspace ?= utils.workspace()
+        # Current working directory
+        process.chdir settings.workspace if settings.chdir is true
+        process.chdir settings.chdir if typeof settings.chdir is 'string'
         # Start
         process.nextTick =>
             if @isShell

@@ -1,23 +1,18 @@
 #!/usr/bin/env coffee
 
-process.chdir __dirname + '/../'
-
 shell = require 'shell'
 
-app = module.exports = shell()
+app = module.exports = shell chdir: true
 
 app.configure ->
     app.use shell.history
         shell: app
     app.use shell.completer
         shell: app
-    app.use shell.router
-        shell: app
     app.use shell.cloud9
-        shell: app
         ip: '127.0.0.1'
         port: '4102'
-    app.use shell.coffee
+    app.use shell.router
         shell: app
     app.use shell.help
         shell: app
