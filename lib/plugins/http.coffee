@@ -6,13 +6,13 @@ module.exports = () ->
     settings = {}
     cmd = () ->
         if path.existsSync settings.workspace + '/server.js'
-            cmd = 'node ' + settings.workspace + '/server'
+            'node ' + settings.workspace + '/server'
         else if path.existsSync settings.workspace + '/server.coffee'
-            cmd = 'coffee ' + settings.workspace + '/server.coffee'
+            'coffee ' + settings.workspace + '/server.coffee'
         else if path.existsSync settings.workspace + '/app.js'
-            cmd = 'node ' + settings.workspace + '/app'
+            'node ' + settings.workspace + '/app'
         else if path.existsSync settings.workspace + '/app.coffee'
-            cmd = 'coffee ' + settings.workspace + '/app.coffee'
+            'coffee ' + settings.workspace + '/app.coffee'
         else
             throw new Error 'Failed to discover a "server.js" or "app.js" file'
     http = null
