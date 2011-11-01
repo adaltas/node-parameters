@@ -40,7 +40,7 @@ module.exports = (settings = {}) ->
             # Launch process
             cloud9 = start_stop.start app, settings, cmd(), (err, pid) ->
                 return next err if err
-                return res.cyan('Cloud9 already started').ln() unless pid
+                return res.cyan('Cloud9 already started').ln() and res.prompt() unless pid
                 ip = settings.ip or '127.0.0.1'
                 port = settings.port or 3000
                 message = "Cloud9 started http://#{ip}:#{port}"

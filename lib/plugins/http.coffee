@@ -32,7 +32,7 @@ module.exports = () ->
         app.cmd 'http start', 'Start HTTP server', (req, res, next) ->
             http = start_stop.start app, settings, cmd(), (err, pid) ->
                 return next err if err
-                return res.cyan('HTTP server already started').ln() unless pid
+                return res.cyan('HTTP server already started').ln() and res.prompt() unless pid
                 res.cyan( 'HTTP server started' ).ln()
                 res.prompt()
         app.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->

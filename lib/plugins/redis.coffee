@@ -19,7 +19,7 @@ module.exports = () ->
             # Launch process
             redis = start_stop.start app, settings, cmd(), (err, pid) ->
                 return next err if err
-                return res.cyan('Redis already started').ln() unless pid
+                return res.cyan('Redis already started').ln() && res.prompt() unless pid
                 res.cyan('Redis started').ln()
                 res.prompt()
         app.cmd 'redis stop', 'Stop Redis', (req, res, next) ->
