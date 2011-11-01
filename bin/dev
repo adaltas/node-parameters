@@ -9,9 +9,7 @@ app.configure ->
         shell: app
     app.use shell.completer
         shell: app
-    app.use shell.cloud9
-        ip: '127.0.0.1'
-        port: '4102'
+    app.use shell.cloud9 port: '4102'
     app.use shell.router
         shell: app
     app.use shell.help
