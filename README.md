@@ -165,7 +165,6 @@ Colors:
 -   `green`
 -   `magenta`
 -   `red`
-
 -   `bgcolor`
 -   `color`
 -   `nocolor`
