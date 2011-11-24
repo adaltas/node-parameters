@@ -31,8 +31,8 @@ module.exports = class Shell extends EventEmitter
         @set 'command', @settings.command ? process.argv.slice(2).join(' ')
         @stack = []
         @styles = styles {stdout: @settings.stdout}
-        process.on 'exit', =>
-            @emit('exit')
+        process.on 'beforeExit', =>
+            @emit 'exit'
         process.on 'uncaughtException', (e) =>
             @emit 'exit', [e]
             @styles.red('Internal error, closing...').ln()
@@ -129,9 +129,13 @@ module.exports = class Shell extends EventEmitter
             @interface().question @styles.raw( @settings.prompt, {color: 'green'}), @run.bind(@)
         else
             @styles.ln()
-            @settings.stdout.destroySoon();
-            @settings.stdout.on 'close', ->
-                process.exit()
+            if process.versions
+                @quit()
+            else 
+                # Node v0.6.1 throw error 'process.stdout cannot be closed'
+                @settings.stdout.destroySoon();
+                @settings.stdout.on 'close', ->
+                    process.exit()
     
     # Ask one or more questions
     question: (questions, callback) ->
@@ -148,15 +152,17 @@ module.exports = class Shell extends EventEmitter
                     next()
         else
             isArray = Array.isArray questions
-            questions = [name: questions, value: ''] if typeof questions is 'string'
-            each questions, (question, next) =>
-                if next is null
-                    answers = answers[questions[0].name] unless isArray
-                    return callback answers
-                @interface().question "#{question.name} [#{question.value}]", (answer) ->
+            questions = [{name: questions, value: ''}] if typeof questions is 'string'
+            each(questions)
+            .on 'item', (next, question) =>
+                q = question.name
+                q += " [#{question.value}]" if question.value
+                @interface().question q, (answer) ->
                     answers[question.name] = if answer is '' then question.value else answer
                     next()
-            
+            .on 'end', ->
+                answers = answers[questions[0].name] unless isArray
+                return callback answers
     
     # Ask a question with a boolean answer
     confirm: (msg, defaultTrue, callback) ->
@@ -180,4 +186,6 @@ module.exports = class Shell extends EventEmitter
     
     # Command quit
     quit: (params) ->
-        process.exit()
+        @emit 'quit'
+        @interface().close()
+        process.stdin.destroy()

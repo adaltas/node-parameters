@@ -108,7 +108,7 @@ module.exports = router = (settings) ->
         routes.push route
         this
     # Register 'quit' command
-    shell.cmd 'quit', 'Exit this shell', shell.quit
+    shell.cmd 'quit', 'Exit this shell', shell.quit.bind shell
     # middleware
     router = (req, res, next) ->
         route = null

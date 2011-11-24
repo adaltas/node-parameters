@@ -103,7 +103,8 @@ By extending `EventEmitter`, the following events are emitted:
 
 -   `"command"`, listen to all executed commands, provide the command name as first argument
 -   `#{command}`, listen to a particular event
--   `"exit"`, called on application exit
+-   `"quit"`, called when the application is about to quit
+-   `"exit"`, called when the process exit
 
 ## Routes plugin
 
