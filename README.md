@@ -51,7 +51,7 @@ app.on('redis quit', function(){
 ## Installation
 
 ```bash
-    npm install shell
+npm install shell
 ```
 
 ## Creating and Configuring a Shell
@@ -153,7 +153,30 @@ The request object contains the following properties:
 -   `command` , Command entered by the user
 -   `params`  , parameters object extracted from the command, defined by the `shell.router` middleware
 
-The response object inherits from styles containing various utilities for printing, coloring and bolding.
+The response object inherits from styles containing methods for printing, coloring and bolding:
+
+-   `bgcolor`
+-   `black`
+-   `blue`
+-   `bold`
+-   `color`
+-   `constructor`
+-   `cyan`
+-   `green`
+-   `ln`
+-   `magenta`
+-   `nocolor`
+-   `pad`
+-   `print`
+-   `println`
+-   `prompt`
+-   `raw`
+-   `red`
+-   `regular`
+-   `reset`
+-   `weight`
+-   `white`
+-   `yellow'
 
 ## History plugin
 
