@@ -1,4 +1,4 @@
-require('coffee-script')
+require('coffee-script');
 
 // Core
 var Shell = module.exports = require('./lib/Shell');
@@ -26,4 +26,4 @@ Shell.routes = {
 Shell.Shell = function(settings){
     console.warn('Deprecated, use `shell()` instead of `shell.Shell()`');
     return new Shell( settings );
-}
+};
