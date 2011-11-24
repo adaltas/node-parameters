@@ -151,32 +151,41 @@ The request object contains the following properties:
 
 -   `shell`   , (required) A reference to your shell application.
 -   `command` , Command entered by the user
--   `params`  , parameters object extracted from the command, defined by the `shell.router` middleware
+-   `params`  , Parameters object extracted from the command, defined by the `shell.router` middleware
 
 The response object inherits from styles containing methods for printing, coloring and bolding:
 
--   `bgcolor`
+Colors:
+
 -   `black`
+-   `white`
+-   `yellow`
 -   `blue`
--   `bold`
--   `color`
--   `constructor`
 -   `cyan`
 -   `green`
--   `ln`
 -   `magenta`
+-   `red`
+
+-   `bgcolor`
+-   `color`
 -   `nocolor`
--   `pad`
+
+Style:
+
+-   `regular`
+-   `weight`
+-   `bold`
+
+Display:
+
+-   `prompt`  , Exits the current command and return user to the prompt.
+-   `ln`
 -   `print`
 -   `println`
--   `prompt`
--   `raw`
--   `red`
--   `regular`
+-   `constructor`
 -   `reset`
--   `weight`
--   `white`
--   `yellow'
+-   `pad`
+-   `raw`
 
 ## History plugin
 
