@@ -33,7 +33,7 @@ normalize = (command, keys, sensitive) ->
             (if optional then '' else slash),
             '(?:',
             (if optional then slash else ''),
-            (format or '') + '([^/.]+))',
+            (format or '') + '([^/]+))',
             (optional or '')
         )
     )
