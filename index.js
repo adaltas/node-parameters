@@ -3,6 +3,7 @@ require('coffee-script');
 // Core
 var Shell = module.exports = require('./lib/Shell');
 Shell.styles = require('./lib/Styles');
+Shell.NullStream = require('./lib/NullStream');
 
 // Plugins
 Shell.cloud9 = require('./lib/plugins/cloud9');
