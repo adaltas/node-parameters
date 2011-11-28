@@ -28,7 +28,10 @@ module.exports = class Shell extends EventEmitter
         @settings.stdin ?= process.stdin
         @settings.stdout ?= process.stdout
         @set 'env', @settings.env ? process.env.NODE_ENV ? 'development'
-        @set 'command', @settings.command ? process.argv.slice(2).join(' ')
+        @set 'command',
+            if typeof settings.command isnt 'undefined'
+            then settings.command
+            else process.argv.slice(2).join(' ')
         @stack = []
         @styles = styles {stdout: @settings.stdout}
         process.on 'beforeExit', =>
@@ -57,7 +60,7 @@ module.exports = class Shell extends EventEmitter
                     @prompt() 
             else
                 command = @set 'command'
-                @run command
+                @run command if command
         return @
     
     # Return the readline interface and create it if not yet initialized
@@ -188,4 +191,4 @@ module.exports = class Shell extends EventEmitter
     quit: (params) ->
         @emit 'quit'
         @interface().close()
-        process.stdin.destroy()
+        @settings.stdin.destroy()
