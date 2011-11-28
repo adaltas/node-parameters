@@ -7,7 +7,7 @@ path = require 'path'
 md5 = (cmd) ->
     crypto.createHash('md5').update(cmd).digest('hex')
 
-pidfile = (cmd) ->
+getPidfile = (cmd) ->
     dir = process.env['HOME'] + '/.node_shell'
     file = md5 cmd
     createDir = not path.existsSync process.env['HOME'] + '/.node_shell'
@@ -21,7 +21,7 @@ module.exports.start = (shell, settings, cmd, callback) ->
     if detach
         cmdStdout = if typeof settings.stdout is 'string' then settings.stdout else '/dev/null'
         cmdStderr = if typeof settings.stderr is 'string' then settings.stderr else '/dev/null'
-        pidfile = settings.pidfile or pidfile cmd
+        pidfile = settings.pidfile or getPidfile cmd
         # return the pid if it match a live process
         pidExists = (pid, callback) ->
             exec "ps -ef | grep #{pid} | grep -v grep", (err, stdout, stderr) ->
@@ -77,7 +77,7 @@ module.exports.start = (shell, settings, cmd, callback) ->
 module.exports.stop = (shell, settings, cmdOrChild, callback) ->
     detach = settings.detach ? not shell.isShell
     if detach
-        pidfile = settings.pidfile or pidfile cmdOrChild
+        pidfile = settings.pidfile or getPidfile cmdOrChild
         #return callback null, false unless path.existsSync pidfile
         path.exists pidfile, (exists) ->
             return callback null, false unless exists
