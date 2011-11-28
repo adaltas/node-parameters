@@ -1,7 +1,7 @@
 
-sys = require('sys')
-assert = require('assert')
-styles = require('../index').styles
+assert = require 'assert'
+shell = require('../index')
+styles = shell.styles
 
 class Writer
     data: ''

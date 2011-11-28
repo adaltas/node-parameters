@@ -5,9 +5,9 @@ assert = require 'assert'
 module.exports =
     'Shell # default constructor': (next) ->
         # Test object
-        app = new shell.Shell { command: '' }
-        assert.ok app instanceof shell.Shell
+        app = new shell { command: '' }
+        assert.ok app instanceof shell
         # Test function
-        app = shell.Shell { command: '' }
-        assert.ok app instanceof shell.Shell
+        app = shell { command: '' }
+        assert.ok app instanceof shell
         next()
