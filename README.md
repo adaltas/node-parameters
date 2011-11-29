@@ -422,3 +422,11 @@ app.cmd('restart', [
     my_app.routes.start
 ]);
 ```
+
+
+Contributors
+------------
+
+*   David Worms : <https://github.com/wdavidw>
+*   Tony: <https://github.com/Zearin>
+*   Russ Frank : <https://github.com/russfrank>

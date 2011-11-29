@@ -6,6 +6,12 @@
     "contributors": [{
         "name": "David Worms",
         "email": "david@adaltas.com"
+    },{
+        "name": "Tony",
+        "email": "https://github.com/Zearin"
+    },{
+        "name": "Russ Frank",
+        "email": "https://github.com/russfrank"
     }],
     "engines": {
         "node": ">= 0.1.90"
@@ -13,8 +19,7 @@
     "dependencies": {
         "coffee-script": "latest",
         "each": "latest",
-        "pad": "latest",
-        "coffeekup": "latest"
+        "pad": "latest"
     },
     "keywords": ["cli", "console", "colors", "xterm"],
     "repository": {
