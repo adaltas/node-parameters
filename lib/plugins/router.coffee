@@ -22,20 +22,22 @@ querystring =
                 obj[k].push v
         obj
 
+# produce regular expression from string
 normalize = (command, keys, sensitive) ->
     command = command
     .concat('/?')
     .replace(/\/\(/g, '(?:/')
-    .replace(/(\/)?(\.)?:(\w+)(\?)?/g, (_, slash, format, key, optional) ->
+    # regexp factors:
+    #    0. match a literal ':'
+    #    1. 'key': match 1 or more word characters followed by :
+    #    2. 'format': match anything inside (), should be a regexp factor
+    #       ie ([0-9]+)
+    #    3. 'optional': match an optional literal '?'
+    .replace(/:(\w+)(\(.*\))?(\?)?/g, (_, key, format, optional) ->
         keys.push key
-        slash ?= ''
-        ''.concat(
-            (if optional then '' else slash),
-            '(?:',
-            (if optional then slash else ''),
-            (format or '') + '([^/.]+))',
-            (optional or '')
-        )
+        format = format or '([^ ]+)' # provide default format
+        optional = optional or ''
+        return format + optional
     )
     .replace(/([\/.])/g, '\\$1')
     .replace(/\*/g, '(.+)')

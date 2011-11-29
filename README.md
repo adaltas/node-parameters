@@ -1,14 +1,16 @@
-# Shell - Nice looking shell applications with pluggable middlewares.
+# Shell: applications with pluggable middleware
 
-The project brings a Connect/Express inspired API and similar functionnalities to console based applications.
+Shell brings a Connect inspired API, Express inspired routing, and other
+similar functionality to console based applications.
 
-## Quick Example, a redis client
+## Example: a simple Redis client
 
 ```javascript
 var shell = require('shell');
 // Initialization
 var app = new shell();
-// Plugins registration
+
+// Middleware registration
 app.configure(function() {
     app.use(shell.history({
         shell: app
@@ -29,6 +31,7 @@ app.configure(function() {
         introduction: true
     }));
 });
+
 // Command registration
 app.cmd('redis keys :pattern', 'Find keys', function(req, res, next){
     if(!app.client){
@@ -40,6 +43,7 @@ app.cmd('redis keys :pattern', 'Find keys', function(req, res, next){
         res.prompt();
     });
 });
+
 // Event notification
 app.on('redis quit', function(){
     if(app.client){
@@ -70,7 +74,7 @@ app.configure('prod', function() {
 
 ## Shell settings
 
-The constructor `shell` take an optional object. Options are:
+The constructor `shell` takes an optional object. Options are:
 
 -   `chdir`      , Changes the current working directory of the process, a string of the directory, boolean true will default to the `workspace` (in which case `workspace` must be provided or discoverable)
 -   `prompt`     , Character for command prompt, Defaults to ">>"
@@ -99,7 +103,7 @@ If `app.configure` is called without specifying the environment as the first arg
 
 ## Shell events
 
-By extending `EventEmitter`, the following events are emitted:
+The following events may be emitted:
 
 -   `"command"`  , listen to all executed commands, provide the command name as first argument.
 -   `#{command}` , listen to a particular event.
@@ -109,12 +113,16 @@ By extending `EventEmitter`, the following events are emitted:
 
 ## Router plugin
 
-The functionalities are a full transcription of the ones present Express. Options passed during creation are:
+The functionality provided by the 'routes' module is very similar to that of
+express.  Options passed during creation are:
 
 -   `shell`     , (required) A reference to your shell application.
--	`sensitive` , (optional) Defaults to `false`, set to `true` if the match should be case sensitive.
+-	 `sensitive` , (optional) Defaults to `false`, set to `true` if the match should be case sensitive.
 
 New routes are defined with the `cmd` method. A route is made of pattern against which the user command is matched, an optional description and one or more route specific middlewares to handle the command. The pattern is either a string or a regular expression. Middlewares receive three parameters: a request object, a response object, and a function. Command parameters are substituted and made available in the `params` object of the request parameter.
+
+Parameters can have restrictions in parenthesis immediately following the
+keyword, as in express: `:id([0-9]+)`.  See the `list` route in the example:
 
 ```javascript
 var app = new shell();
@@ -123,6 +131,7 @@ app.configure(function(){
         shell: app
     }));
 });
+
 // Route middleware
 var auth = function(req, res, next){
 	if(req.params.uid == process.getuid()){
@@ -131,6 +140,7 @@ var auth = function(req, res, next){
 		throw new Error('Not me');
 	}
 }
+
 // Global parameter substitution
 app.param('uid', function(req, res, next){
 	exec('whoami', function(err, stdout, sdterr){
@@ -138,14 +148,21 @@ app.param('uid', function(req, res, next){
 		next();
 	});
 });
+
 // Simple command
 app.cmd('help', function(req, res){
 	res.cyan('Run this command `./ami user ' + process.getuid() + '`');
 	res.prompt()
 });
+
 // Command with parameter and two route middlewares
 app.cmd('user :uid', auth, function(req, res){
 	res.cyan('Yes, you are ' + req.params.username);
+});
+
+app.cmd('list :id([0-9]+)', function(req, res) {
+   res.cyan('List: foo bar');
+   res.prompt();
 });
 ```
 
