@@ -9,7 +9,8 @@ module.exports = class NullStream extends events.EventEmitter
     pipe: ->
     # Writable Stream
     writable: true
-    write: ->
+    write: (data) ->
+        @emit 'data', data
     end: ->
     # Shared API
     destroy: ->

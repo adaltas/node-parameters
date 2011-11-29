@@ -100,12 +100,14 @@ module.exports = class Shell extends EventEmitter
         next = (err) ->
             layer = self.stack[ index++ ]
             if not layer
+                return self.emit('error', err) if err
                 if command isnt ''
                     res.red 'Command failed to execute ' + command + ( if err then ': ' + err.message else '')
                 return res.prompt()
             arity = layer.handle.length
             if err
                 if arity is 4
+                    self.emit('error', err)
                     layer.handle err, req, res, next
                 else
                     next err
@@ -192,3 +194,4 @@ module.exports = class Shell extends EventEmitter
         @emit 'quit'
         @interface().close()
         @settings.stdin.destroy()
+        #@set 'stdin', null

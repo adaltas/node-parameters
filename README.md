@@ -101,12 +101,13 @@ If `app.configure` is called without specifying the environment as the first arg
 
 By extending `EventEmitter`, the following events are emitted:
 
--   `"command"`, listen to all executed commands, provide the command name as first argument
--   `#{command}`, listen to a particular event
--   `"quit"`, called when the application is about to quit
--   `"exit"`, called when the process exit
+-   `"command"`  , listen to all executed commands, provide the command name as first argument.
+-   `#{command}` , listen to a particular event.
+-   `"quit"`     , called when the application is about to quit.
+-   `"error"`    , called on error providing the error object as the first callback argument.
+-   `"exit"`     , called when the process exit.
 
-## Routes plugin
+## Router plugin
 
 The functionalities are a full transcription of the ones present Express. Options passed during creation are:
 
