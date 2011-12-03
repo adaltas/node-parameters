@@ -111,3 +111,7 @@ Styles.prototype.reset = (text) ->
     @print null,
         color: null
         weight: 'regular'
+
+# Remove style
+Styles.unstyle = (text) -> text.replace(/\x1b.*?m/g, '')
+

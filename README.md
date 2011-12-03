@@ -122,6 +122,7 @@ The request object contains the following properties:
 -   `command` , Command entered by the user
 -   `params`  , Parameters object extracted from the command, defined by the `shell.router` middleware
 -   `qestion` , Ask questions with optionally suggested and default answers
+-   `confirm` , Ask a question expecting a boolean answer
 
 ## `Response` parameter
 

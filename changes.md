@@ -6,6 +6,8 @@ Version 0.2.4
 -------------
 
 `Shell.question` has been removed, use `req.question` instead
+`Shell.confirm` has been removed, use `req.confirm` instead
+Add `styles.unstyle`
 
 Version 0.2.3
 -------------

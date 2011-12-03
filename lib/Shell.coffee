@@ -14,7 +14,7 @@ Interface = require('readline').Interface
 Interface.prototype.setPrompt = ( (parent) ->
     (prompt, length) ->
         args = Array.prototype.slice.call arguments
-        args[1] = args[0].replace(/\x1b.*?m/g, '').length if not args[1]
+        args[1] = styles.unstyle(args[0]).length if not args[1]
         parent.apply @, args
 )( Interface.prototype.setPrompt )
 
@@ -144,26 +144,6 @@ module.exports = class Shell extends EventEmitter
                 @settings.stdout.destroySoon();
                 @settings.stdout.on 'close', ->
                     process.exit()
-    
-    # Ask a question with a boolean answer
-    confirm: (msg, defaultTrue, callback) ->
-        args = arguments
-        unless callback
-            callback = defaultTrue
-            defaultTrue = true
-        @settings.key_true ?= 'y'
-        @settings.key_false ?= 'n'
-        key_true = @settings.key_true.toLowerCase() 
-        key_false = @settings.key_false.toLowerCase() 
-        keyTrue  = if defaultTrue then key_true.toUpperCase()  else key_true
-        keyFalse = if defaultTrue then key_false else key_false.toUpperCase()
-        msg += "[#{keyTrue}#{keyFalse}] "
-        @interface().question @styles.raw( msg, {color: 'green'}), (answer) =>
-            accepted = ['', key_true, key_false]
-            answer = answer.toLowerCase()
-            valid = accepted.indexOf(answer) isnt -1
-            return @confirm.apply(@, args) unless valid
-            callback answer is key_true or (defaultTrue and answer is '')
     
     # Command quit
     quit: (params) ->
