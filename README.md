@@ -3,6 +3,14 @@
 Shell brings a Connect inspired API, Express inspired routing, and other
 similar functionality to console based applications.
 
+## Installation
+
+Shell is open source and licensed under the new BSD license.
+
+```bash
+    npm install shell
+```
+
 ## Example: a simple Redis client
 
 ```javascript
@@ -45,12 +53,6 @@ app.cmd('redis keys :pattern', 'Find keys', function(req, res, next){
 app.on('quit', function(){
     app.client.quit();
 });
-```
-
-## Installation
-
-```bash
-npm install shell
 ```
 
 ## Creating and Configuring a Shell
@@ -332,12 +334,11 @@ app.configure(function() {
 
 **Important:** If you encounter issue while installing cloud9, it might be because the npm module expect an older version of Node. 
 
-Here's the procedure to use the newer version on the devel branch:
+Here's the procedure to use the latest version:
 
 ```
 git clone https://github.com/ajaxorg/cloud9.git
 cd cloud9
-git checkout -b devel origin/devel
 git submodule update --init --recursive
 npm link
 ```
