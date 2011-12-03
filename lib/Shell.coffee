@@ -102,7 +102,9 @@ module.exports = class Shell extends EventEmitter
             if not layer
                 return self.emit('error', err) if err
                 if command isnt ''
-                    res.red 'Command failed to execute ' + command + ( if err then ': ' + err.message else '')
+                    text = "Command failed to execute #{command}"
+                    text += ": #{err.message or err.name}" if err
+                    res.red text
                 return res.prompt()
             arity = layer.handle.length
             if err
@@ -131,7 +133,8 @@ module.exports = class Shell extends EventEmitter
     # Display prompt
     prompt: ->
         if @isShell
-            @interface().question @styles.raw( @settings.prompt, {color: 'green'}), @run.bind(@)
+            text = @styles.raw( @settings.prompt, {color: 'green'})
+            @interface().question text, @run.bind(@)
         else
             @styles.ln()
             if process.versions
@@ -141,33 +144,6 @@ module.exports = class Shell extends EventEmitter
                 @settings.stdout.destroySoon();
                 @settings.stdout.on 'close', ->
                     process.exit()
-    
-    # Ask one or more questions
-    question: (questions, callback) ->
-        isObject = questions? and typeof questions is 'object'
-        answers = {}
-        if isObject
-            answers = []
-            each questions, (question, settings, next) =>
-                unless next
-                    return callback answers
-                settings = {value: settings} unless settings and typeof settings is 'object'
-                @interface().question "#{question} [#{settings.value}]", (answer) ->
-                    answers[question] = if answer is '' then settings.value else answer
-                    next()
-        else
-            isArray = Array.isArray questions
-            questions = [{name: questions, value: ''}] if typeof questions is 'string'
-            each(questions)
-            .on 'item', (next, question) =>
-                q = question.name
-                q += " [#{question.value}]" if question.value
-                @interface().question q, (answer) ->
-                    answers[question.name] = if answer is '' then question.value else answer
-                    next()
-            .on 'end', ->
-                answers = answers[questions[0].name] unless isArray
-                return callback answers
     
     # Ask a question with a boolean answer
     confirm: (msg, defaultTrue, callback) ->
@@ -181,7 +157,7 @@ module.exports = class Shell extends EventEmitter
         key_false = @settings.key_false.toLowerCase() 
         keyTrue  = if defaultTrue then key_true.toUpperCase()  else key_true
         keyFalse = if defaultTrue then key_false else key_false.toUpperCase()
-        msg += " [#{keyTrue}#{keyFalse}]"
+        msg += "[#{keyTrue}#{keyFalse}] "
         @interface().question @styles.raw( msg, {color: 'green'}), (answer) =>
             accepted = ['', key_true, key_false]
             answer = answer.toLowerCase()

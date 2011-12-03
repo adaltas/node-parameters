@@ -8,47 +8,42 @@ similar functionality to console based applications.
 ```javascript
 var shell = require('shell');
 // Initialization
-var app = new shell();
-
+var app = new shell( { chdir: __dirname } )
 // Middleware registration
 app.configure(function() {
+    app.use(function(req, res, next){
+        app.client = require('redis').createClient()
+        next()
+    });
     app.use(shell.history({
         shell: app
     }));
     app.use(shell.completer({
         shell: app
     }));
-    app.use(shell.router({
-        shell: app
-    }));
     app.use(shell.redis({
-        shell: app,
         config: 'redis.conf',
         pidfile: 'redis.pid'
+    }));
+    app.use(shell.router({
+        shell: app
     }));
     app.use(shell.help({
         shell: app,
         introduction: true
     }));
 });
-
 // Command registration
 app.cmd('redis keys :pattern', 'Find keys', function(req, res, next){
-    if(!app.client){
-        app.client = require('redis').createClient();
-    }
     app.client.keys(req.params.pattern, function(err, keys){
         if(err){ return res.styles.red(err.message), next(); }
         res.cyan(keys.join('\n')||'no keys');
         res.prompt();
     });
 });
-
 // Event notification
-app.on('redis quit', function(){
-    if(app.client){
-        app.client.quit();
-    }
+app.on('quit', function(){
+    app.client.quit();
 });
 ```
 
@@ -101,6 +96,12 @@ As with Express, `app.configure` allows the customization of plugins for all or 
 
 If `app.configure` is called without specifying the environment as the first argument, the provided callback is always called. Otherwise, the environment must match the `env` setting or the global variable `NODE_ENV`.
 
+## Middlewares and plugins
+
+Shell is build on a middleware architecute. When a command is issued, multiple callbacks are executed sequentially until one decide to stop the process  (calling `res.prompt()` or `shell.quit`. Those callbacks are called middlewares. A callback recieve 3 arguments: a `request` object, a `response` object and the next callback. Traditionnaly, `request` deals with `stdin` while `response` deals with `stdout`.
+
+A plugin is simply a function which configure and return a middleware. Same plugin also enrich the Shell application with new routes and functions.
+
 ## Shell events
 
 The following events may be emitted:
@@ -110,6 +111,50 @@ The following events may be emitted:
 -   `"quit"`     , called when the application is about to quit.
 -   `"error"`    , called on error providing the error object as the first callback argument.
 -   `"exit"`     , called when the process exit.
+
+## `Request` parameter
+
+The request object contains the following properties:
+
+-   `shell`   , (required) A reference to your shell application.
+-   `command` , Command entered by the user
+-   `params`  , Parameters object extracted from the command, defined by the `shell.router` middleware
+-   `qestion` , Ask questions with optionally suggested and default answers
+
+## `Response` parameter
+
+The response object inherits from styles containing methods for printing, coloring and bolding:
+
+Colors:
+
+-   `black`
+-   `white`
+-   `yellow`
+-   `blue`
+-   `cyan`
+-   `green`
+-   `magenta`
+-   `red`
+-   `bgcolor`
+-   `color`
+-   `nocolor`
+
+Style:
+
+-   `regular`
+-   `weight`
+-   `bold`
+
+Display:
+
+-   `prompt`  , Exits the current command and return user to the prompt.
+-   `ln`
+-   `print`
+-   `println`
+-   `constructor`
+-   `reset`
+-   `pad`
+-   `raw`
 
 ## Router plugin
 
@@ -155,55 +200,17 @@ app.cmd('help', function(req, res){
 	res.prompt()
 });
 
-// Command with parameter and two route middlewares
+// Command with parameter
 app.cmd('user :uid', auth, function(req, res){
 	res.cyan('Yes, you are ' + req.params.username);
 });
 
-app.cmd('list :id([0-9]+)', function(req, res) {
-   res.cyan('List: foo bar');
+// Command with contrained parameter
+app.cmd('user :id([0-9]+)', function(req, res) {
+   res.cyan('User id is ' + req.params.id);
    res.prompt();
 });
 ```
-
-The request object contains the following properties:
-
--   `shell`   , (required) A reference to your shell application.
--   `command` , Command entered by the user
--   `params`  , Parameters object extracted from the command, defined by the `shell.router` middleware
-
-The response object inherits from styles containing methods for printing, coloring and bolding:
-
-Colors:
-
--   `black`
--   `white`
--   `yellow`
--   `blue`
--   `cyan`
--   `green`
--   `magenta`
--   `red`
--   `bgcolor`
--   `color`
--   `nocolor`
-
-Style:
-
--   `regular`
--   `weight`
--   `bold`
-
-Display:
-
--   `prompt`  , Exits the current command and return user to the prompt.
--   `ln`
--   `print`
--   `println`
--   `constructor`
--   `reset`
--   `pad`
--   `raw`
 
 ## History plugin
 

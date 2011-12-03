@@ -5,53 +5,9 @@ shell = require 'shell'
 app = module.exports = shell chdir: true
 
 app.configure ->
-    app.use shell.history
-        shell: app
-    app.use shell.completer
-        shell: app
+    app.use shell.history shell: app
+    app.use shell.completer shell: app
     app.use shell.cloud9 port: '4102'
-    app.use shell.router
-        shell: app
-    app.use shell.help
-        shell: app
-        introduction: true
-    app.use shell.error
-        shell: app
-
-app.cmd 'test short', (req, res) ->
-    res.cyan 'This was short'
-    res.prompt()
-
-app.cmd 'test long', (req, res) ->
-    for i in [0 .. 10]
-        message = []
-        for [0 .. 10]
-            message.push ' This was long'
-        res.cyan i + message.join(' ') + '\n'
-    res.prompt()
-
-app.cmd 'test question string', (req, res) ->
-    req.question 'question_1', (values) ->
-        console.log values
-        res.prompt()
-
-app.cmd 'test question array', (req, res) ->
-    req.question [
-        name: 'question_1'
-        value: 'default 1'
-    ,
-        name: 'question_2'
-        value: 'default 2'
-    ], (values) ->
-        console.log values
-        res.prompt()
-
-app.cmd 'test question object', (req, res) ->
-    req.question
-        'question_1': 'default 1'
-        'question_2':
-            value: 'default 2'
-    , (values) ->
-        console.log values
-        res.prompt()
-    
+    app.use shell.router shell: app
+    app.use shell.help {shell: app, introduction: true}
+    app.use shell.error shell: app
