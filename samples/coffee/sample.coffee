@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env coffee
 
     shell = require 'shell'
     
@@ -15,7 +15,7 @@
             stdout:  __dirname + '/coffee.out.log'
             stderr:  __dirname + '/coffee.err.log'
             pidfile: __dirname + '/coffee.pid'
-            detach:  false
+            detach:  true
         app.use shell.help
             shell: app
             introduction: true

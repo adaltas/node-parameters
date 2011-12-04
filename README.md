@@ -114,7 +114,7 @@ The following events may be emitted:
 -   `"error"`    , called on error providing the error object as the first callback argument.
 -   `"exit"`     , called when the process exit.
 
-## `Request` parameter
+## Request parameter
 
 The request object contains the following properties:
 
@@ -124,7 +124,7 @@ The request object contains the following properties:
 -   `qestion` , Ask questions with optionally suggested and default answers
 -   `confirm` , Ask a question expecting a boolean answer
 
-## `Response` parameter
+## Response parameter
 
 The response object inherits from styles containing methods for printing, coloring and bolding:
 
@@ -150,14 +150,14 @@ Style:
 
 Display:
 
--   `prompt`  , Exits the current command and return user to the prompt.
--   `ln`
--   `print`
--   `println`
--   `constructor`
--   `reset`
--   `pad`
--   `raw`
+
+-   `prompt`     , Exits the current command and return user to the prompt.
+-   `ln`         , Print a new line
+-   `print`      , Print a text
+-   `println`    , Print a text followed by a new line
+-   `reset`      , Stop any formating like color or bold
+-   `pad`        , Print a text with a fixed padding
+-   `raw`        , Return a text
 
 ## Router plugin
 
@@ -219,15 +219,15 @@ app.cmd('user :id([0-9]+)', function(req, res) {
 
 Persistent command history over multiple sessions. Options passed during creation are:
 
--   `shell` , (required) A reference to your shell application.
--   `name`  , Identify your project history file, default to the hash of the exectuted file
--	`dir`   , Location of the history files, defaults to `"#{process.env['HOME']}/.node_shell"`
+-   `shell`    , (required) A reference to your shell application.
+-   `name`     , Identify your project history file, default to the hash of the exectuted file
+-	`dir`      , Location of the history files, defaults to `"#{process.env['HOME']}/.node_shell"`
 
 ## Completer plugin
 
 Provides tab completion. Options passed during creation are:
 
--	`shell` , (required) A reference to your shell application.
+-	`shell`    , (required) A reference to your shell application.
 
 ## Help plugin
 
@@ -243,8 +243,8 @@ Additionnaly, a new `shell.help()` function is made available. Options passed du
 Register two commands, `http start` and `http stop`. The start command will search for "./server.js" and "./app.js" (and additionnaly their CoffeeScript alternatives) to run by `node`.The following properties may be provided as settings:
 
 -	`config`   , Path to the configuration file. Required to launch redis.
--	`detach`   , Wether the HTTP process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
--	`pidfile`  , Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-	`attach`   , Wether the HTTP process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-	`pidfile`  , Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
 -	`stdout`   , Writable stream or file path to redirect the server stdout.
 -	`stderr`   , Writable stream or file path to redirect the server stderr.
 -	`workspace`, Project directory used to resolve relative paths and search for "server" and "app" scripts.
@@ -271,11 +271,11 @@ app.configure(function() {
 
 Register two commands, `redis start` and `redis stop`. The following properties may be provided as settings:
 
--	`config` Path to the configuration file. Required to launch redis.
--	`detach` Wether the Redis process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
--	`pidfile` Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
--	`stdout` Writable stream or file path to redirect cloud9 stdout.
--	`stderr` Writable stream or file path to redirect cloud9 stderr.
+-	`config`   , Path to the configuration file. Required to launch redis.
+-   `attach`   , Wether the Redis process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-	`pidfile` Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-	`stdout`   , Writable stream or file path to redirect cloud9 stdout.
+-	`stderr`   , Writable stream or file path to redirect cloud9 stderr.
 
 Example:
     
@@ -302,17 +302,17 @@ Register two commands, `cloud9 start` and `cloud9 stop`. Unless provided, the Cl
 
 Options:
 
--	`config` Load the configuration from a config file. Overrides command-line options. Defaults to `null`.
--	`group` Run child processes with a specific group.
--	`user` Run child processes as a specific user.
--	`action` Define an action to execute after the Cloud9 server is started. Defaults to `null`.
--	`ip` IP address where Cloud9 will serve from. Defaults to `"127.0.0.1"`.
--	`port` Port number where Cloud9 will serve from. Defaults to `3000`.
--	`workspace` Path to the workspace that will be loaded in Cloud9, Defaults to `Shell.set('workspace')`.
--	`detach` Wether the Cloud9 process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
--	`pidfile` Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
--	`stdout` Writable stream or file path to redirect cloud9 stdout.
--	`stderr` Writable stream or file path to redirect cloud9 stderr.
+-	`config`   , Load the configuration from a config file. Overrides command-line options. Defaults to `null`.
+-	`group`    , Run child processes with a specific group.
+-	`user`     , Run child processes as a specific user.
+-	`action`   , Define an action to execute after the Cloud9 server is started. Defaults to `null`.
+-	`ip`       , IP address where Cloud9 will serve from. Defaults to `"127.0.0.1"`.
+-	`port`     , Port number where Cloud9 will serve from. Defaults to `3000`.
+-	`workspace`, Path to the workspace that will be loaded in Cloud9, Defaults to `Shell.set('workspace')`.
+-   `attach`   , Wether the Cloud9 process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-	`pidfile` Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-	`stdout`   , Writable stream or file path to redirect cloud9 stdout.
+-	`stderr`   , Writable stream or file path to redirect cloud9 stderr.
 
 Example:
     
@@ -350,15 +350,15 @@ Start Coffee in `--watch` mode, so scripts are instantly compiled into Javascrip
 
 Options:
 
--	`src` Directory where ".coffee" are stored. Each ".coffee" script will be compiled into a .js JavaScript file of the same name.
+-	`src`      , Directory where ".coffee" are stored. Each ".coffee" script will be compiled into a .js JavaScript file of the same name.
 -	`output` Directory where compiled JavaScript files are written. Used in conjunction with "compile".
--	`lint` If the `jsl` (JavaScript Lint) command is installed, use it to check the compilation of a CoffeeScript file.
--	`require` Load a library before compiling or executing your script. Can be used to hook in to the compiler (to add Growl notifications, for example).
--	`detach` Wether the Coffee process should be attached to the current process. If not defined, default to `true` in shell mode and `false` in command mode.
--	`pidfile` Path to the file storing the detached process id. Defaults to `"/.node_shell/#{md5}.pid"`
--	`stdout` Writable stream or file path to redirect cloud9 stdout.
--	`stderr` Writable stream or file path to redirect cloud9 stderr.
--	`workspace` Project directory used to resolve relative paths.
+-	`lint`     , If the `jsl` (JavaScript Lint) command is installed, use it to check the compilation of a CoffeeScript file.
+-	`require`  , Load a library before compiling or executing your script. Can be used to hook in to the compiler (to add Growl notifications, for example).
+-   `attach`   , Wether the Coffee process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-	`pidfile`  , Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-	`stdout`   , Writable stream or file path to redirect cloud9 stdout.
+-	`stderr`   , Writable stream or file path to redirect cloud9 stderr.
+-	`workspace`, Project directory used to resolve relative paths.
 
 Example:
 

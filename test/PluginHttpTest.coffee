@@ -6,7 +6,7 @@ http = require 'http'
 module.exports = 
     'Http start/stop': (next) ->
         app = shell
-            workspace:  "#{__dirname}/plugins_http"
+            workspace:  "#{__dirname}/PluginsHtpp"
             command: null
             stdin: new shell.NullStream
             stdout: new shell.NullStream

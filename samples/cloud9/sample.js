@@ -14,7 +14,7 @@
             stdout: __dirname+'/cloud9.out.log',
             stderr: __dirname+'/cloud9.err.log',
             pidfile: __dirname+'/cloud9.pid',
-            detach: true
+            attach: false
         }));
         app.use(shell.router({
             shell: app

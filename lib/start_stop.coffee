@@ -1,58 +1,70 @@
 
 crypto = require 'crypto'
-exec = require('child_process').exec
+child = require 'child_process'
 fs = require 'fs'
 path = require 'path'
+
+start_stop = module.exports = {}
 
 md5 = (cmd) ->
     crypto.createHash('md5').update(cmd).digest('hex')
 
-getPidfile = (cmd) ->
-    dir = process.env['HOME'] + '/.node_shell'
-    file = md5 cmd
-    createDir = not path.existsSync process.env['HOME'] + '/.node_shell'
+getPidfile = (settings, callback) ->
+    return callback null, settings.pidfile if settings.pidfile
+    dir = path.resolve process.env['HOME'], '.node_shell'
+    file = md5 settings.cmd
+    createDir = not path.existsSync dir
     fs.mkdirSync dir, 0700 if createDir
-    "#{dir}/#{file}.pid"
+    settings.pidfile = "#{dir}/#{file}.pid"
+    callback null
 
-module.exports.start = (shell, settings, cmd, callback) ->
-    detach = settings.detach ? not shell.isShell
-    #if detach and not settings.pidfile
-        #throw new Error 'Property settings.pidfile required in detached mode'
-    if detach
-        cmdStdout = if typeof settings.stdout is 'string' then settings.stdout else '/dev/null'
-        cmdStderr = if typeof settings.stderr is 'string' then settings.stderr else '/dev/null'
-        pidfile = settings.pidfile or getPidfile cmd
-        # return the pid if it match a live process
-        pidExists = (pid, callback) ->
-            exec "ps -ef | grep #{pid} | grep -v grep", (err, stdout, stderr) ->
-                return callback err if err and err.code isnt 1
-                return callback null, null if err
-                callback null, pid
-                #callback err
-        # return the pid if it can read it from the pidfile
+###
+*   `cmd`       Command to run
+*   `daemon`    Daemonize the child process
+*   `pidfile`   Path to the file storing the child pid
+*   `stdout`    Path to the file where stdout is redirected
+*   `stderr`    Path to the file where stderr is redirected
+###
+start_stop.start = (settings, callback) ->
+    unless settings.attach
+        cmdStdout =
+            if typeof settings.stdout is 'string' 
+            then settings.stdout else '/dev/null'
+        cmdStderr =
+            if typeof settings.stderr is 'string'
+            then settings.stderrelse '/dev/null'
+        # Get the pid if it can read it from the pidfile
         pidRead = (callback) ->
-            path.exists pidfile, (exists) ->
+            path.exists settings.pidfile, (exists) ->
                 return callback null, null unless exists
-                fs.readFile pidfile, (err, pid) ->
+                fs.readFile settings.pidfile, (err, pid) ->
                     return callback err if err
                     pid = parseInt pid, 10
                     callback null, pid
-        start = () ->
+        # Start the process
+        start = (callback) ->
             pipe = "</dev/null >#{cmdStdout} 2>#{cmdStdout}"
             info = 'echo $? $!'
-            child = exec "#{cmd} #{pipe} & #{info}", (err, stdout, stderr) ->
+            cmd = "#{settings.cmd} #{pipe} & #{info}"
+            child.exec cmd, (err, stdout, stderr) ->
                 [code, pid] = stdout.split(' ')
-                return callback new Error "Process exit with code #{code}" if code isnt '0'
-                fs.writeFileSync pidfile, '' + pid
-                callback null, pid
-        pidRead (err, pid) ->
-            return start() unless pid
-            pidExists pid, (err, pid) ->
-                return start() unless pid
-                callback null, false
+                code = parseInt code, 10
+                pid = parseInt pid, 10
+                if code isnt 0
+                    msg = "Process exit with code #{code}"
+                    return callback new Error msg
+                fs.writeFile settings.pidfile, '' + pid, (err) ->
+                    callback null, pid
+        # Do the all job
+        getPidfile settings, (err) ->
+            pidRead (err, pid) ->
+                return start callback unless pid
+                start_stop.pidRunning pid, (err, pid) ->
+                    callback new Error "Pid #{pid} already running" if pid
+                    start callback
     else # Kill child on exit if started in attached mode
-        shell.on 'exit', -> child.kill()
-        child = exec cmd
+        #shell.on 'exit', -> child.kill()
+        c = child.exec settings.cmd
         if typeof settings.stdout is 'string'
             stdout =  fs.createWriteStream settings.stdout
         else if settings.stdout isnt null and typeof settings.stdout is 'object'
@@ -65,47 +77,46 @@ module.exports.start = (shell, settings, cmd, callback) ->
             stderr = settings.stderr
         else
             stderr = null
-        child.stderr.pipe stdout if stdout
-        child.stderr.pipe stderr if stderr
+        #process.stdout.pipe stdout if stdout
+        #process.stderr.pipe stderr if stderr
         process.nextTick ->
             # Block the command if not in shell and process is attached
-            return if not shell.isShell and settings.detach is false
-            callback null, child.pid
-        child
+            #return if not shell.isShell and settings.daemon
+            callback null, c.pid
 
-
-module.exports.stop = (shell, settings, cmdOrChild, callback) ->
-    detach = settings.detach ? not shell.isShell
-    if detach
-        pidfile = settings.pidfile or getPidfile cmdOrChild
-        #return callback null, false unless path.existsSync pidfile
-        path.exists pidfile, (exists) ->
-            return callback null, false unless exists
-            pid = fs.readFileSync pidfile, 'ascii'
-            pid = pid.trim()
-            cmds = []
-            cmds.push "for i in `ps -ef| awk '$3 == '#{pid}' { print $2 }'` ; do kill $i ; done"
-            cmds.push "kill #{pid}"
-            cmds = cmds.join ' && '
-            child = exec cmds, (err, stdout, stderr) ->
-                if err and err.code is 1 and /No such process/.test(stderr)
-                    return fs.unlink pidfile, (err) ->
+start_stop.stop = (settings, callback) ->
+    if typeof settings is 'string' or typeof settings is 'number'
+        settings = {pid: parseInt(settings, 10), attach: true}
+    kill = (pid, callback) ->
+        cmds = """
+        for i in `ps -ef | awk '$3 == '#{pid}' { print $2 }'`
+        do
+            kill $i
+        done
+        kill #{pid}
+        """
+        child.exec cmds, (err, stdout, stderr) ->
+            callback err
+    unless settings.attach
+        getPidfile settings, (err) ->
+            #return callback null, false unless path.existsSync pidfile
+            path.exists settings.pidfile, (exists) ->
+                return callback null, false unless exists
+                pid = fs.readFileSync settings.pidfile, 'ascii'
+                pid = pid.trim()
+                return fs.unlink settings.pidfile, (err) ->
+                    return callback err if err
+                    kill pid, (err, stdout, stderr) ->
                         return callback err if err
-                        return callback null, false
-                else if err
-                    return callback err
-                callback null, true
-            #child.on 'exit', (code) ->
-                #return callback new Error "Unexpected exit code #{code}" unless code is 0
-                #fs.unlinkSync pidfile
-                #callback null, true
+                        callback null, true
     else
-        pid = cmdOrChild.pid
-        cmds = []
-        cmds.push "for i in `ps -ef | awk '$3 == '#{pid}' { print $2 }'` ; do kill $i ; done"
-        cmds.push "kill #{pid}"
-        cmds = cmds.join ' && '
-        child = exec(cmds)
-        child.on 'exit', (code) ->
-            return callback new Error "Unexpected exit code #{code}" unless code is 0
+        kill settings.pid, (err) ->
+            return callback new Error "Unexpected exit code #{err.code}" if err
             callback null, true
+###
+Get the pid if it match a live process
+###
+start_stop.pidRunning = (pid, callback) ->
+    child.exec "ps -ef | grep #{pid} | grep -v grep", (err, stdout, stderr) ->
+        return callback err if err and err.code isnt 1
+        callback null, not err

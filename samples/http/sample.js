@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-    var fs = require('fs'),
-        exec = require('child_process').exec,
-        spawn = require('child_process').spawn,
-        shell = require('shell');
+    var fs = require('fs');
+    var exec = require('child_process').exec;
+    var spawn = require('child_process').spawn;
+    var shell = require('shell');
     
     process.chdir(__dirname);
     
@@ -18,7 +18,7 @@
             stdout: __dirname + '/logs/http.out.log',
             stderr: __dirname + '/logs/http.err.log',
             pidfile: __dirname + '/tmp/http.pid',
-            detach: true
+            attach: false
         }));
         app.use(shell.router({shell: app}));
         app.use(shell.help({shell: app, introduction: true}));
