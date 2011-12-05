@@ -3,8 +3,6 @@ start_stop = require '../start_stop'
 
 module.exports = () ->
     settings = {}
-    cmd = () ->
-        "redis-server #{settings.config}"
     # Register commands
     redis = null
     route = (req, res, next) ->
@@ -15,15 +13,18 @@ module.exports = () ->
         # Default settings
         settings.workspace ?= app.set 'workspace'
         settings.config ?= ''
+        settings.cmd = "redis-server #{settings.config}"
         app.cmd 'redis start', 'Start Redis', (req, res, next) ->
             # Launch process
-            redis = start_stop.start app, settings, cmd(), (err, pid) ->
+            redis = start_stop.start settings, (err, pid) ->
                 return next err if err
-                return res.cyan('Redis already started').ln() && res.prompt() unless pid
+                unless pid
+                    res.cyan('Redis already started').ln()
+                    return res.prompt() 
                 res.cyan('Redis started').ln()
                 res.prompt()
         app.cmd 'redis stop', 'Stop Redis', (req, res, next) ->
-            start_stop.stop app, settings, redis or cmd(), (err, success) ->
+            start_stop.stop settings, (err, success) ->
                 if success
                 then res.cyan('Redis successfully stoped').ln()
                 else res.magenta('Redis was not started').ln()

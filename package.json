@@ -21,6 +21,9 @@
         "each": "latest",
         "pad": "latest"
     },
+    "devDependencies": {
+        "express": "latest"
+    },
     "keywords": ["cli", "console", "colors", "xterm"],
     "repository": {
         "type": "git",

@@ -20,7 +20,6 @@ module.exports = (settings = {}) ->
     # Default settings
     settings.workspace ?= shell.set 'workspace'
     throw new Error 'No workspace provided' if not settings.workspace
-    coffee = null
     cmd = () ->
         args = []
         # Before compiling, concatenate all scripts together in the
@@ -59,9 +58,10 @@ module.exports = (settings = {}) ->
             args.push '-c'
             args.push enrichFiles(settings.compile)
         cmd = 'coffee ' + args.join(' ')
+    settings.cmd = cmd()
     # Register commands
     shell.cmd 'coffee start', 'Start CoffeeScript', (req, res, next) ->
-        coffee = start_stop.start shell, settings, cmd(), (err, pid) ->
+        start_stop.start settings, (err, pid) ->
             return next err if err
             return res.cyan('Already Started').ln() unless pid
             ip = settings.ip or '127.0.0.1'
@@ -70,7 +70,7 @@ module.exports = (settings = {}) ->
             res.cyan( message ).ln()
             res.prompt()
     shell.cmd 'coffee stop', 'Stop CoffeeScript', (req, res, next) ->
-        start_stop.stop shell, settings, coffee or cmd(), (err, success) ->
+        start_stop.stop settings, (err, success) ->
             if success
             then res.cyan('CoffeeScript successfully stoped').ln()
             else res.magenta('CoffeeScript was not started').ln()

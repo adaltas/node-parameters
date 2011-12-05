@@ -6,7 +6,7 @@ module.exports =
     'Test # plugin # throw # print error': (next) ->
         stdout = new shell.NullStream
         app = shell
-            workspace:  "#{__dirname}/plugins_http"
+            workspace:  "#{__dirname}/PluginsHttp"
             command: 'test error'
             stdin: new shell.NullStream
             stdout: stdout
@@ -24,7 +24,7 @@ module.exports =
             next()
     'Test # plugin # throw # emit error': (next) ->
         app = shell
-            workspace:  "#{__dirname}/plugins_http"
+            workspace:  "#{__dirname}/PluginsHttp"
             command: 'test error'
             stdin: new shell.NullStream
             stdout: new shell.NullStream
@@ -39,7 +39,7 @@ module.exports =
             next()
     'Test # no plugin # next # emit error': (next) ->
         app = shell
-            workspace:  "#{__dirname}/plugins_http"
+            workspace:  "#{__dirname}/PluginsHttp"
             command: 'test error'
             stdin: new shell.NullStream
             stdout: new shell.NullStream

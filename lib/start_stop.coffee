@@ -82,6 +82,7 @@ start_stop.start = (settings, callback) ->
         process.nextTick ->
             # Block the command if not in shell and process is attached
             #return if not shell.isShell and settings.daemon
+            settings.pid = c.pid
             callback null, c.pid
 
 start_stop.stop = (settings, callback) ->

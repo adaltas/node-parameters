@@ -6,14 +6,14 @@ http = require 'http'
 module.exports = 
     'Http start/stop': (next) ->
         app = shell
-            workspace:  "#{__dirname}/PluginsHtpp"
+            workspace:  "#{__dirname}/PluginsHttp"
             command: null
             stdin: new shell.NullStream
             stdout: new shell.NullStream
         app.configure ->
             #app.use shell.history(shell: app)
             #app.use shell.completer(shell: app)
-            app.use shell.http
+            app.use shell.http attach: true
             app.use shell.router shell: app
             #app.use shell.error shell: app
         app.run 'http start'

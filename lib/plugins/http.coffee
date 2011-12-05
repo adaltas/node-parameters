@@ -29,14 +29,15 @@ module.exports = () ->
         # Messages
         settings.message_start ?= 'HTTP server successfully started'
         settings.message_stop ?= 'HTTP server successfully stopped'
+        settings.cmd = cmd()
         app.cmd 'http start', 'Start HTTP server', (req, res, next) ->
-            http = start_stop.start app, settings, cmd(), (err, pid) ->
+            http = start_stop.start settings, (err, pid) ->
                 return next err if err
                 return res.cyan('HTTP server already started').ln() and res.prompt() unless pid
                 res.cyan( 'HTTP server started' ).ln()
                 res.prompt()
         app.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->
-            start_stop.stop app, settings, http or cmd(), (err, success) ->
+            start_stop.stop settings, (err, success) ->
                 if success
                 then res.cyan('HTTP server successfully stoped').ln()
                 else res.magenta('HTTP server was not started').ln()
