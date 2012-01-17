@@ -15,7 +15,7 @@
             stdout:  __dirname + '/coffee.out.log'
             stderr:  __dirname + '/coffee.err.log'
             pidfile: __dirname + '/coffee.pid'
-            detach:  true
+            attach:  false
         app.use shell.help
             shell: app
             introduction: true

@@ -4,7 +4,6 @@ start_stop = require '../start_stop'
 
 # Sanitize a list of files separated by spaces
 enrichFiles = (files) ->
-    return null if not settings.workspace
     return files.split(' ').map( (file) ->
         if file.substr(0, 1) isnt '/'
             file = '/' + file

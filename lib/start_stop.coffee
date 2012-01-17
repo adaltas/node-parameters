@@ -32,7 +32,7 @@ start_stop.start = (settings, callback) ->
             then settings.stdout else '/dev/null'
         cmdStderr =
             if typeof settings.stderr is 'string'
-            then settings.stderrelse '/dev/null'
+            then settings.stderr else '/dev/null'
         # Get the pid if it can read it from the pidfile
         pidRead = (callback) ->
             path.exists settings.pidfile, (exists) ->
