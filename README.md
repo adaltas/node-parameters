@@ -3,6 +3,15 @@
 Shell brings a Connect inspired API, Express inspired routing, and other
 similar functionality to console based applications.
 
+* Run both in shell mode and command mode
+* First class citizen for console application (arrows, ctrl-a, ctrl-u,...)
+* User friendly with history, help messages and many other plugings
+* Foundation to structure and build complex based applications
+* Command matching, parameters and advanced functionnalities found in Express routing
+* Flexible architecture based on middlewares for plugin creation and routing enhancement
+* Familiar API for those of us using Connect or Express
+* Predifined commands with plugins for Redis, HTTP servers, Cloud9, CoffeeScript, ...
+
 ## Installation
 
 Shell is open source and licensed under the new BSD license.
