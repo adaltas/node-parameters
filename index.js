@@ -15,6 +15,7 @@ Shell.history = require('./lib/plugins/history');
 Shell.http = require('./lib/plugins/http');
 Shell.router = require('./lib/plugins/router');
 Shell.redis = require('./lib/plugins/redis');
+Shell.stylus = require('./lib/plugins/stylus');
 Shell.test = require('./lib/plugins/test');
 
 // Routes
