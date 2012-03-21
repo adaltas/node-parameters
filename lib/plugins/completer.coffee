@@ -1,4 +1,14 @@
 
+###
+
+Completer plugin
+================
+
+Provides tab completion. Options passed during creation are:
+
+-   `shell`    , (required) A reference to your shell application.
+
+###
 module.exports = (settings) ->
     # Validation
     throw new Error 'No shell provided' if not settings.shell

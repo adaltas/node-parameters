@@ -6,6 +6,18 @@ Interface = require('readline').Interface
 
 hash = (value) -> crypto.createHash('md5').update(value).digest('hex')
 
+###
+
+History plugin
+==============
+
+Persistent command history over multiple sessions. Options passed during creation are:
+
+-   `shell`    , (required) A reference to your shell application.
+-   `name`     , Identify your project history file, default to the hash of the exectuted file
+-   `dir`      , Location of the history files, defaults to `"#{process.env['HOME']}/.node_shell"`
+
+###
 module.exports = (settings) ->
     # Validation
     throw new Error 'No shell provided' if not settings.shell

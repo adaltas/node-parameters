@@ -1,7 +1,41 @@
 
 path = require 'path'
 start_stop = require '../start_stop'
+###
 
+HTTP server
+===========
+
+Register two commands, `http start` and `http stop`. The start command will 
+search for "./server.js" and "./app.js" (and additionnaly their CoffeeScript 
+alternatives) to run by `node`.The following properties may be provided as settings:
+
+-   `config`   , Path to the configuration file. Required to launch redis.
+-   `attach`   , Wether the HTTP process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-   `pidfile`  , Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-   `stdout`   , Writable stream or file path to redirect the server stdout.
+-   `stderr`   , Writable stream or file path to redirect the server stderr.
+-   `workspace`, Project directory used to resolve relative paths and search for "server" and "app" scripts.
+
+Example:
+
+```javascript
+var app = new shell();
+app.configure(function() {
+    app.use(shell.router({
+        shell: app
+    }));
+    app.use(shell.http({
+        shell: app
+    }));
+    app.use(shell.help({
+        shell: app,
+        introduction: true
+    }));
+});
+```
+
+###
 module.exports = () ->
     settings = {}
     cmd = () ->

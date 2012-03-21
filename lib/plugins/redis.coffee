@@ -1,6 +1,37 @@
 
 start_stop = require '../start_stop'
 
+###
+Redis Plugin
+============
+
+Register two commands, `redis start` and `redis stop`. The following properties may be provided as settings:
+
+-   `config`   , Path to the configuration file. Required to launch redis.
+-   `attach`   , Wether the Redis process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-   `pidfile` Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-   `stdout`   , Writable stream or file path to redirect cloud9 stdout.
+-   `stderr`   , Writable stream or file path to redirect cloud9 stderr.
+
+Example:
+    
+```javascript
+var app = shell();
+app.configure(function() {
+    app.use(shell.router({
+        shell: app
+    }));
+    app.use(shell.redis({
+        shell: app,
+        config: __dirname+'/redis.conf')
+    }));
+    app.use(shell.help({
+        shell: app,
+        introduction: true
+    }));
+});
+```
+###
 module.exports = () ->
     settings = {}
     # Register commands

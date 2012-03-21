@@ -14,16 +14,41 @@ enrichFiles = (files) ->
 
 ###
 
-Coffee plugin
--------------
-Start/stop a daemon to watch and convert coffee files to js.   
+CoffeeScript plugin
+===================
 
-Options include:   
-*   `join`      Before compiling, concatenate all scripts together in the order they were passed, and write them into the specified file. Useful for building large projects.
-*   `lint`      If the jsl (JavaScript Lint) command is installed, use it to check the compilation of a CoffeeScript file. (Handy in conjunction with --watch)
-*   `require`   Load a library before compiling or executing your script. Can be used to hook in to the compiler (to add Growl notifications, for example).
-*   `output`    Write out all compiled JavaScript files into the specified directory. Use in conjunction with --compile or --watch.
-*   `compile`   Compile a .coffee script into a .js JavaScript file of the same name.
+Start Coffee in `--watch` mode, so scripts are instantly compiled into Javascript.
+
+Options:
+
+-   `src`      , Directory where ".coffee" are stored. Each ".coffee" script will be compiled into a .js JavaScript file of the same name.
+-   `join`     , Before compiling, concatenate all scripts together in the order they were passed, and write them into the specified file. Useful for building large projects.
+-   `output`   , Directory where compiled JavaScript files are written. Used in conjunction with "compile".
+-   `lint`     , If the `jsl` (JavaScript Lint) command is installed, use it to check the compilation of a CoffeeScript file.
+-   `require`  , Load a library before compiling or executing your script. Can be used to hook in to the compiler (to add Growl notifications, for example).
+-   `attach`   , Wether the Coffee process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-   `pidfile`  , Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-   `stdout`   , Writable stream or file path to redirect cloud9 stdout.
+-   `stderr`   , Writable stream or file path to redirect cloud9 stderr.
+-   `workspace`, Project directory used to resolve relative paths.
+
+Example:
+
+```javascript
+var app = new shell();
+app.configure(function() {
+    app.use(shell.router({
+        shell: app
+    }));
+    app.use(shell.coffee({
+        shell: app
+    }));
+    app.use(shell.help({
+        shell: app,
+        introduction: true
+    }));
+});
+```
 
 ###
 module.exports = (settings = {}) ->
