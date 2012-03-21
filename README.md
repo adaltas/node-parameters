@@ -67,7 +67,7 @@ app.on('quit', function(){
 ## Creating and Configuring a Shell
 
 ```javascript
-var app = new shell();
+var app = shell();
 app.configure(function() {
     app.use(shell.history({shell: app}));
     app.use(shell.completer({shell: app}));
