@@ -12,6 +12,20 @@ enrichFiles = (files) ->
         file
     ).join ' '
 
+###
+
+Coffee plugin
+-------------
+Start/stop a daemon to watch and convert coffee files to js.   
+
+Options include:   
+*   `join`      Before compiling, concatenate all scripts together in the order they were passed, and write them into the specified file. Useful for building large projects.
+*   `lint`      If the jsl (JavaScript Lint) command is installed, use it to check the compilation of a CoffeeScript file. (Handy in conjunction with --watch)
+*   `require`   Load a library before compiling or executing your script. Can be used to hook in to the compiler (to add Growl notifications, for example).
+*   `output`    Write out all compiled JavaScript files into the specified directory. Use in conjunction with --compile or --watch.
+*   `compile`   Compile a .coffee script into a .js JavaScript file of the same name.
+
+###
 module.exports = (settings = {}) ->
     # Validation
     throw new Error 'No shell provided' if not settings.shell
@@ -21,36 +35,24 @@ module.exports = (settings = {}) ->
     throw new Error 'No workspace provided' if not settings.workspace
     cmd = () ->
         args = []
-        # Before compiling, concatenate all scripts together in the
-        # order they were passed, and write them into the specified
-        # file. Useful for building large projects.
+        # 
         if settings.join
             args.push '-j'
             args.push enrichFiles(settings.join)
         # Watch the modification times of the coffee-scripts,
         # recompiling as soon as a change occurs.
         args.push '-w'
-        # If the jsl (JavaScript Lint) command is installed, use it
-        # to check the compilation of a CoffeeScript file. (Handy
-        # in conjunction with --watch)
         if settings.lint
             args.push '-l'
-        # Load a library before compiling or executing your script.
-        # Can be used to hook in to the compiler (to add Growl
-        # notifications, for example).
         if settings.require
             args.push '-r'
             args.push settings.require
         # Compile the JavaScript without the top-level function
         # safety wrapper. (Used for CoffeeScript as a Node.js module.)
         args.push '-b'
-        # Write out all compiled JavaScript files into the specified
-        # directory. Use in conjunction with --compile or --watch.
         if settings.output
             args.push '-o'
             args.push enrichFiles(settings.output)
-        # Compile a .coffee script into a .js JavaScript file
-        # of the same name.
         if not settings.compile
             settings.compile = settings.workspace
         if settings.compile
@@ -63,8 +65,6 @@ module.exports = (settings = {}) ->
         start_stop.start settings, (err, pid) ->
             return next err if err
             return res.cyan('Already Started').ln() unless pid
-            ip = settings.ip or '127.0.0.1'
-            port = settings.port or 3000
             message = "CoffeeScript started"
             res.cyan( message ).ln()
             res.prompt()

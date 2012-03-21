@@ -12,14 +12,14 @@ module.exports =
             assert.ifError err
             assert.ok typeof pid is 'number'
             # Check if process started
-            start_stop.pidRunning pid, (err, exists) ->
+            start_stop.running pid, (err, exists) ->
                 assert.ifError err
                 assert.ok exists
                 # Stop process
                 start_stop.stop cmd:cmd, (err) ->
                     assert.ifError err
                     # Check if process stoped
-                    start_stop.pidRunning pid, (err, exists) ->
+                    start_stop.running pid, (err, exists) ->
                         assert.ifError err
                         assert.ok not exists
                         next()
@@ -30,16 +30,32 @@ module.exports =
             assert.ifError err
             assert.ok not stoped
             next()
-    'Test daemon # stop inactive process with pidfile': (next) ->
+    'Test daemon # stop inactive process with pidfile # relax': (next) ->
         cmd = "node #{__dirname}/StartStopTest/server.js"
         pidfile = "#{__dirname}/StartStopTest/pidfile"
         fs.writeFile pidfile, "1234567", (err) ->
             # Check process doesnt exists
-            start_stop.pidRunning 1234567, (err, exists) ->
+            start_stop.running 1234567, (err, exists) ->
                 assert.ifError err
                 assert.ok not exists
                 # Stop process
                 start_stop.stop {cmd:cmd, pidfile: pidfile}, (err, stoped) ->
+                    assert.ok err is null
+                    assert.eql stoped, false
+                    # Pidfile shall be removed even if pid is invalid
+                    path.exists pidfile, (exists) ->
+                        assert.ok not exists
+                        next()
+    'Test daemon # stop inactive process with pidfile # strict': (next) ->
+        cmd = "node #{__dirname}/StartStopTest/server.js"
+        pidfile = "#{__dirname}/StartStopTest/pidfile"
+        fs.writeFile pidfile, "1234567", (err) ->
+            # Check process doesnt exists
+            start_stop.running 1234567, (err, exists) ->
+                assert.ifError err
+                assert.ok not exists
+                # Stop process
+                start_stop.stop {cmd:cmd, pidfile: pidfile, strict: true}, (err, stoped) ->
                     assert.ok err instanceof Error
                     # Pidfile shall be removed even if pid is invalid
                     path.exists pidfile, (exists) ->
@@ -52,14 +68,14 @@ module.exports =
             assert.ifError err
             assert.ok typeof pid is 'number'
             # Check if process started
-            start_stop.pidRunning pid, (err, exists) ->
+            start_stop.running pid, (err, exists) ->
                 assert.ifError err
                 assert.ok exists
                 # Stop process
                 start_stop.stop pid, (err) ->
                     assert.ifError err
                     # Check if process stoped
-                    start_stop.pidRunning pid, (err, exists) ->
+                    start_stop.running pid, (err, exists) ->
                         assert.ifError err
                         assert.ok not exists
                         next()

@@ -1,123 +1,232 @@
 
 crypto = require 'crypto'
-child = require 'child_process'
+{exec} = require 'child_process'
 fs = require 'fs'
 path = require 'path'
 
-start_stop = module.exports = {}
-
-md5 = (cmd) ->
-    crypto.createHash('md5').update(cmd).digest('hex')
-
-getPidfile = (settings, callback) ->
-    return callback null, settings.pidfile if settings.pidfile
-    dir = path.resolve process.env['HOME'], '.node_shell'
-    file = md5 settings.cmd
-    createDir = not path.existsSync dir
-    fs.mkdirSync dir, 0700 if createDir
-    settings.pidfile = "#{dir}/#{file}.pid"
-    callback null
+md5 = (cmd) -> crypto.createHash('md5').update(cmd).digest('hex')
 
 ###
-*   `cmd`       Command to run
-*   `daemon`    Daemonize the child process
-*   `pidfile`   Path to the file storing the child pid
-*   `stdout`    Path to the file where stdout is redirected
-*   `stderr`    Path to the file where stderr is redirected
+`start_stop`: Unix process management
+-------------------------------------
+
+The library start and stop unix child process. Process are by default 
+daemonized and will keep running even if your current process exit. For 
+conveniency, they may also be attached to the current process by 
+providing the `attach` option.
+
 ###
-start_stop.start = (settings, callback) ->
-    unless settings.attach
-        cmdStdout =
-            if typeof settings.stdout is 'string' 
-            then settings.stdout else '/dev/null'
-        cmdStderr =
-            if typeof settings.stderr is 'string'
-            then settings.stderr else '/dev/null'
-        # Get the pid if it can read it from the pidfile
-        pidRead = (callback) ->
-            path.exists settings.pidfile, (exists) ->
-                return callback null, null unless exists
-                fs.readFile settings.pidfile, (err, pid) ->
-                    return callback err if err
+module.exports = start_stop =
+
+    ###
+
+    `start(options, callback)`
+    --------------------------
+    Start a prcess as a daemon (default) or as a child of the current process.
+
+    `options`           , Object with the following properties:
+    *   `cmd`           , Command to run
+    *   `attach`        , Attach the child process to the current process
+    *   `pidfile`       , Path to the file storing the child pid
+    *   `stdout`        , Path to the file where standard output is redirected
+    *   `stderr`        , Path to the file where standard error is redirected
+    *   `strict`        , Send an error when a pid file exists and reference
+                          an unrunning pid.
+    
+    `callback`          , Received arguments are:
+    *   `err`           , Error if any
+    *   `pid`           , Process id of the new child
+
+    ###
+    start: (options, callback) ->
+        unless options.attach
+            cmdStdout =
+                if typeof options.stdout is 'string' 
+                then options.stdout else '/dev/null'
+            cmdStderr =
+                if typeof options.stderr is 'string'
+                then options.stderr else '/dev/null'
+            # Start the process
+            start = (callback) ->
+                pipe = "</dev/null >#{cmdStdout} 2>#{cmdStdout}"
+                info = 'echo $? $!'
+                cmd = "#{options.cmd} #{pipe} & #{info}"
+                exec cmd, (err, stdout, stderr) ->
+                    [code, pid] = stdout.split(' ')
+                    code = parseInt code, 10
                     pid = parseInt pid, 10
-                    callback null, pid
-        # Start the process
-        start = (callback) ->
-            pipe = "</dev/null >#{cmdStdout} 2>#{cmdStdout}"
-            info = 'echo $? $!'
-            cmd = "#{settings.cmd} #{pipe} & #{info}"
-            child.exec cmd, (err, stdout, stderr) ->
-                [code, pid] = stdout.split(' ')
-                code = parseInt code, 10
-                pid = parseInt pid, 10
-                if code isnt 0
-                    msg = "Process exit with code #{code}"
-                    return callback new Error msg
-                fs.writeFile settings.pidfile, '' + pid, (err) ->
-                    callback null, pid
-        # Do the all job
-        getPidfile settings, (err) ->
-            pidRead (err, pid) ->
+                    if code isnt 0
+                        msg = "Process exit with code #{code}"
+                        return callback new Error msg
+                    fs.writeFile options.pidfile, '' + pid, (err) ->
+                        callback null, pid
+            # Do the job
+            start_stop.pid options, (err, pid) ->
                 return start callback unless pid
-                start_stop.pidRunning pid, (err, pid) ->
+                start_stop.running pid, (err, pid) ->
                     callback new Error "Pid #{pid} already running" if pid
-                    start callback
-    else # Kill child on exit if started in attached mode
-        #shell.on 'exit', -> child.kill()
-        c = child.exec settings.cmd
-        if typeof settings.stdout is 'string'
-            stdout =  fs.createWriteStream settings.stdout
-        else if settings.stdout isnt null and typeof settings.stdout is 'object'
-            stdout = settings.stdout
-        else
-            stdout = null
-        if typeof settings.stderr is 'string'
-            stdout =  fs.createWriteStream settings.stderr
-        else if settings.stderr isnt null and typeof settings.stderr is 'object'
-            stderr = settings.stderr
-        else
-            stderr = null
-        #process.stdout.pipe stdout if stdout
-        #process.stderr.pipe stderr if stderr
-        process.nextTick ->
-            # Block the command if not in shell and process is attached
-            #return if not shell.isShell and settings.daemon
-            settings.pid = c.pid
-            callback null, c.pid
+                    # Pid file reference an unrunning process
+                    if options.strict
+                    then callback new Error "Pid file reference a dead process"
+                    else start callback
+        else # Kill child on exit if started in attached mode
+            c = exec options.cmd
+            if typeof options.stdout is 'string'
+                stdout =  fs.createWriteStream options.stdout
+            else if options.stdout isnt null and typeof options.stdout is 'object'
+                stdout = options.stdout
+            else
+                stdout = null
+            if typeof options.stderr is 'string'
+                stdout =  fs.createWriteStream options.stderr
+            else if options.stderr isnt null and typeof options.stderr is 'object'
+                stderr = options.stderr
+            else
+                stderr = null
+            process.nextTick ->
+                # Block the command if not in shell and process is attached
+                options.pid = c.pid
+                callback null, c.pid
+    
+    ###
 
-start_stop.stop = (settings, callback) ->
-    if typeof settings is 'string' or typeof settings is 'number'
-        settings = {pid: parseInt(settings, 10), attach: true}
-    kill = (pid, callback) ->
-        cmds = """
-        for i in `ps -ef | awk '$3 == '#{pid}' { print $2 }'`
-        do
-            kill $i
-        done
-        kill #{pid}
-        """
-        child.exec cmds, (err, stdout, stderr) ->
-            callback err
-    unless settings.attach
-        getPidfile settings, (err) ->
-            #return callback null, false unless path.existsSync pidfile
-            path.exists settings.pidfile, (exists) ->
-                return callback null, false unless exists
-                pid = fs.readFileSync settings.pidfile, 'ascii'
-                pid = pid.trim()
-                return fs.unlink settings.pidfile, (err) ->
+    `stop(options, callback)`
+    -------------------------
+    Stop a process. In daemon mode, the pid is obtained from the `pidfile` option which, if 
+    not provided, can be guessed from the `cmd` option used to start the process.
+
+    `options`           , Object with the following properties:
+    *   `attach`        , Attach the child process to the current process
+    *   `cmd`           , Command used to run the process, in case no pidfile is provided
+    *   `pid`           , Pid to kill in attach mode
+    *   `pidfile`       , Path to the file storing the child pid
+    *   `strict`        , Send an error when a pid file exists and reference
+                          an unrunning pid.
+    
+    `callback`          , Received arguments are:
+    *   `err`           , Error if any
+    *   `stoped`        , True if the process was stoped
+
+    ###
+    stop: (options, callback) ->
+        if typeof options is 'string' or typeof options is 'number'
+            options = {pid: parseInt(options, 10), attach: true}
+        kill = (pid, callback) ->
+            # Not trully recursive, potential scripts:
+            # http://machine-cycle.blogspot.com/2009/05/recursive-kill-kill-process-tree.html
+            # http://unix.derkeiler.com/Newsgroups/comp.unix.shell/2004-05/1108.html
+            cmds = """
+            for i in `ps -ef | awk '$3 == '#{pid}' { print $2 }'`
+            do
+                kill $i
+            done
+            kill #{pid}
+            """
+            exec cmds, (err, stdout, stderr) ->
+                callback err
+        unless options.attach
+            start_stop.pid options, (err, pid) ->
+                return callback err if err
+                return callback null, false unless pid
+                fs.unlink options.pidfile, (err) ->
                     return callback err if err
-                    kill pid, (err, stdout, stderr) ->
-                        return callback err if err
-                        callback null, true
-    else
-        kill settings.pid, (err) ->
-            return callback new Error "Unexpected exit code #{err.code}" if err
-            callback null, true
-###
-Get the pid if it match a live process
-###
-start_stop.pidRunning = (pid, callback) ->
-    child.exec "ps -ef | grep #{pid} | grep -v grep", (err, stdout, stderr) ->
-        return callback err if err and err.code isnt 1
-        callback null, not err
+                    start_stop.running pid, (err, running) ->
+                        unless running
+                            return if options.strict
+                            then callback new Error "Pid file reference a dead process"
+                            else callback null, false
+                        kill pid, (err, stdout, stderr) ->
+                            return callback err if err
+                            callback null, true
+        else
+            kill options.pid, (err) ->
+                return callback new Error "Unexpected exit code #{err.code}" if err
+                options.pid = false
+                callback null, true
+    
+    ###
+
+    `pid(options, callback)`
+    ------------------------
+    Retrieve a process pid. The pid value is return only if the command is running 
+    otherwise it is set to false.
+
+    `options`           , Object with the following properties:
+    *   `attach`        , True if the child process is attached to the current process
+    *   `cmd`           , Command used to run the process, in case no pidfile is provided
+    *   `pid`           , Pid to kill in attach mode
+    *   `pidfile`       , Path to the file storing the child pid
+
+
+    `callback`          , Received arguments are:
+    *   `err`           , Error if any
+    *   `pid`           , Process pid. Pid is null if there are no pid file or 
+                          if the process isn't running.
+    
+    ###
+    pid: (options, callback) ->
+        # Attach mode
+        if options.attach
+            return new Error 'Expect a pid property in attached mode' unless options.pid?
+            return callback null, options.pid
+        # Deamon mode
+        start_stop.file options, (err, file, exists) ->
+            return callback null, false unless exists
+            fs.readFile options.pidfile, 'ascii', (err, pid) ->
+                return callback err if err
+                pid = pid.trim()
+                callback null, pid
+
+    ###
+
+    `file(options, callback)`
+    -------------------------
+    Retrieve information relative to the file storing the pid. Retrieve 
+    the path to the file storing the pid number and whether 
+    it exists or not. Note, it will additionnaly enrich the `options`
+    argument with a pidfile property unless already present.
+
+    `options`           , Object with the following properties:
+    *   `attach`        , True if the child process is attached to the current process
+    *   `cmd`           , Command used to run the process, in case no pidfile is provided
+    *   `pid`           , Pid to kill in attach mode
+    *   `pidfile`       , Path to the file storing the child pid
+
+    `callback`          , Received arguments are:
+    *   `err`           , Error if any
+    *   `path`          , Path to the file storing the pid, null in attach mode
+    *   `exists`        , True if the file is created
+
+    ###
+    file: (options, callback) ->
+        return callback null, null, false if options.attach
+        unless options.pidfile
+            dir = path.resolve process.env['HOME'], '.node_shell'
+            file = md5 options.cmd
+            createDir = not path.existsSync dir
+            fs.mkdirSync dir, 0700 if createDir
+            options.pidfile = "#{dir}/#{file}.pid"
+        path.exists options.pidfile, (exists) ->
+            callback null, options.pidfile, exists
+    
+    ###
+
+    `running(pid, callback)`
+    ------------------------
+
+    Test if a pid match a running process.
+
+    `pid`               , Process id to test
+
+    `callback`          , Received arguments are:
+    *   `err`           , Error if any
+    *   `running`       , True if pid match a running process
+
+    ###
+    running: (pid, callback) ->
+        # exec "ps -ef | grep #{pid} | grep -v grep", (err, stdout, stderr) ->
+        exec "ps -ef #{pid} | grep -V PID", (err, stdout, stderr) ->
+            return callback err if err and err.code isnt 1
+            callback null, not err
+
+
