@@ -8,14 +8,22 @@ HTTP server
 
 Register two commands, `http start` and `http stop`. The start command will 
 search for "./server.js" and "./app.js" (and additionnaly their CoffeeScript 
-alternatives) to run by `node`.The following properties may be provided as settings:
+alternatives) to run by `node`.
 
--   `config`   , Path to the configuration file. Required to launch redis.
--   `attach`   , Wether the HTTP process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
--   `pidfile`  , Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
--   `stdout`   , Writable stream or file path to redirect the server stdout.
--   `stderr`   , Writable stream or file path to redirect the server stderr.
--   `workspace`, Project directory used to resolve relative paths and search for "server" and "app" scripts.
+The following properties may be provided as settings:
+
+-   `message_start` Message to display once the server is started
+-   `message_stop`  Message to display once the server is stoped
+-   `workspace`     Project directory used to resolve relative paths and search for "server" and "app" scripts.
+-   `cmd`           Command to start the server, not required if path is provided or if the script is discoverable
+-   `path`          Path to the js/coffee script starting the process, may be relative to the workspace, extension isn't required.
+
+Properties derived from the start_stop utility:   
+
+-   `attach`        Wether the HTTP process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-   `pidfile`       Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-   `stdout`        Writable stream or file path to redirect the server stdout.
+-   `stderr`        Writable stream or file path to redirect the server stderr.
 
 Example:
 
@@ -39,16 +47,28 @@ app.configure(function() {
 module.exports = () ->
     settings = {}
     cmd = () ->
-        if path.existsSync settings.workspace + '/server.js'
-            'node ' + settings.workspace + '/server'
-        else if path.existsSync settings.workspace + '/server.coffee'
-            'coffee ' + settings.workspace + '/server.coffee'
-        else if path.existsSync settings.workspace + '/app.js'
-            'node ' + settings.workspace + '/app'
-        else if path.existsSync settings.workspace + '/app.coffee'
-            'coffee ' + settings.workspace + '/app.coffee'
-        else
-            throw new Error 'Failed to discover a "server.js" or "app.js" file'
+        searchs = if settings.path then [settings.path] else ['server', 'app']
+        for search in searchs
+            search = path.resolve settings.workspace, search
+            if path.existsSync "#{search}"
+                if search.substr(-4) is '.coffee'
+                then return "coffee #{search}"
+                else return "node #{search}"
+            if path.existsSync "#{search}.js"
+                return "node #{search}.js"
+            else if path.existsSync "#{search}.coffee"
+                return "coffee #{search}.coffee"
+        throw new Error 'Failed to discover a "server.js" or "app.js" file'
+        # return "node #{path.resolve settings.workspace, settings.path}" if settings.path
+        # if path.existsSync "#{settings.workspace}/server.js"
+        #     "node #{settings.workspace}/server"
+        # else if path.existsSync "#{settings.workspace}/server.coffee"
+        #     "coffee #{settings.workspace}/server.coffee"
+        # else if path.existsSync "#{settings.workspace}/app.js"
+        #     "node #{settings.workspace}/app"
+        # else if path.existsSync "#{settings.workspace}/app.coffee"
+        #     "coffee #{settings.workspace}/app.coffee"
+        # else throw new Error 'Failed to discover a "server.js" or "app.js" file'
     http = null
     # Register commands
     route = (req, res, next) ->
@@ -57,23 +77,23 @@ module.exports = () ->
         return next() if app.tmp.http
         app.tmp.http = true
         # Workspace settings
-        settings ?= {}
         settings.workspace ?= app.set 'workspace'
         throw new Error 'No workspace provided' if not settings.workspace
         # Messages
         settings.message_start ?= 'HTTP server successfully started'
         settings.message_stop ?= 'HTTP server successfully stopped'
-        settings.cmd = cmd()
+        settings.cmd = cmd() unless settings.cmd
+        console.log settings.cmd
         app.cmd 'http start', 'Start HTTP server', (req, res, next) ->
             http = start_stop.start settings, (err, pid) ->
                 return next err if err
                 return res.cyan('HTTP server already started').ln() and res.prompt() unless pid
-                res.cyan( 'HTTP server started' ).ln()
+                res.cyan(settings.message_start).ln()
                 res.prompt()
         app.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->
             start_stop.stop settings, (err, success) ->
                 if success
-                then res.cyan('HTTP server successfully stoped').ln()
+                then res.cyan(settings.message_stop).ln()
                 else res.magenta('HTTP server was not started').ln()
                 res.prompt()
         next()
