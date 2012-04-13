@@ -204,7 +204,7 @@ module.exports = start_stop =
             dir = path.resolve process.env['HOME'], '.node_shell'
             file = md5 options.cmd
             createDir = not path.existsSync dir
-            fs.mkdirSync dir, 0700 if createDir
+            fs.mkdirSync dir, 0o0700 if createDir
             options.pidfile = "#{dir}/#{file}.pid"
         path.exists options.pidfile, (exists) ->
             callback null, options.pidfile, exists
@@ -225,7 +225,7 @@ module.exports = start_stop =
     ###
     running: (pid, callback) ->
         # exec "ps -ef | grep #{pid} | grep -v grep", (err, stdout, stderr) ->
-        exec "ps -ef #{pid} | grep -V PID", (err, stdout, stderr) ->
+        exec "ps -ef #{pid} | grep -v PID", (err, stdout, stderr) ->
             return callback err if err and err.code isnt 1
             callback null, not err
 

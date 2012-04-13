@@ -1,54 +1,48 @@
 
+should = require 'should'
 shell = require '..'
-assert = require 'assert'
 
-module.exports =
-    'Test # plugin # throw # print error': (next) ->
+describe 'plugin error', ->
+    it 'should print a thrown error', (next) ->
         stdout = new shell.NullStream
+        out = ''
+        stdout.on 'data', (data) ->
+            out += data
         app = shell
-            workspace:  "#{__dirname}/PluginsHttp"
             command: 'test error'
             stdin: new shell.NullStream
             stdout: stdout
         app.configure ->
-            app.use shell.http
             app.use shell.router shell: app
             app.use shell.error shell: app
         app.cmd 'test error', (req, res) ->
-            assert.ok false
-        out = ''
-        stdout.on 'data', (data) ->
-            out += data
+            should.not.exist true
         app.on 'quit', ->
-            assert.ok /AssertionError/.test out
+            out.should.match /AssertionError/ 
             next()
-    'Test # plugin # throw # emit error': (next) ->
+    it 'should emit thrown error', (next) ->
         app = shell
-            workspace:  "#{__dirname}/PluginsHttp"
             command: 'test error'
             stdin: new shell.NullStream
             stdout: new shell.NullStream
         app.configure ->
-            app.use shell.http
             app.use shell.router shell: app
             app.use shell.error shell: app
         app.cmd 'test error', (req, res) ->
-            assert.ok false
+            should.not.exist true
         app.on 'error', (err) ->
-            assert.eql err.name, 'AssertionError'
+            err.name.should.eql 'AssertionError'
             next()
-    'Test # no plugin # next # emit error': (next) ->
+    it 'router should graph error from previous route and emit it', (next) ->
         app = shell
-            workspace:  "#{__dirname}/PluginsHttp"
             command: 'test error'
             stdin: new shell.NullStream
             stdout: new shell.NullStream
         app.configure ->
-            app.use shell.http
             app.use shell.router shell: app
         app.cmd 'test error', (req, res, n) ->
             n new Error 'My error'
         app.on 'error', (err) ->
-            assert.eql err.message, 'My error'
+            err.message.should.eql 'My error'
             next()
     

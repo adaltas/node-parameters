@@ -1,21 +1,18 @@
 
-assert = require 'assert'
-shell = require 'shell'
+should = require 'should'
 http = require 'http'
+shell = require '..'
 
-module.exports = 
-    'Http start/stop': (next) ->
+describe 'Plugin HTTP', ->
+    it 'should start and stop an HTTP server', (next) ->
         app = shell
-            workspace:  "#{__dirname}/PluginsHttp"
+            workspace:  "#{__dirname}/plugin_http"
             command: null
             stdin: new shell.NullStream
             stdout: new shell.NullStream
         app.configure ->
-            #app.use shell.history(shell: app)
-            #app.use shell.completer(shell: app)
             app.use shell.http attach: true
             app.use shell.router shell: app
-            #app.use shell.error shell: app
         app.run 'http start'
         setTimeout ->
             http.get(
@@ -24,7 +21,7 @@ module.exports =
                 path: '/ping'
             , (res) ->
                 res.on 'data', (chunk) ->
-                    assert.eql chunk.toString(), 'pong'
+                    chunk.toString().should.eql 'pong'
                     app.run 'http stop'
                     setTimeout ->
                         http.get(
@@ -32,12 +29,12 @@ module.exports =
                             port: 8834
                             path: '/ping'
                         , (res) ->
-                            assert.ok false
+                            should.not.exist false
                         ).on 'error', (e) ->
-                            assert.ok e instanceof Error
+                            e.should.be.an.instanceof Error
                             next()
                     , 300
             ).on 'error', (e) ->
-                assert.ifError e
+                should.not.exist e
                 next e
         , 300

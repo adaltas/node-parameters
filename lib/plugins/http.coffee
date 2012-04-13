@@ -83,7 +83,6 @@ module.exports = () ->
         settings.message_start ?= 'HTTP server successfully started'
         settings.message_stop ?= 'HTTP server successfully stopped'
         settings.cmd = cmd() unless settings.cmd
-        console.log settings.cmd
         app.cmd 'http start', 'Start HTTP server', (req, res, next) ->
             http = start_stop.start settings, (err, pid) ->
                 return next err if err

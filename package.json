@@ -22,11 +22,15 @@
         "pad": "latest"
     },
     "devDependencies": {
-        "express": "latest"
+        "mocha": "latest",
+        "should": "latest"
     },
     "keywords": ["cli", "console", "colors", "xterm"],
     "repository": {
         "type": "git",
         "url": "https://github.com/wdavidw/node-shell.git"
+    },
+    "scripts": {
+        "test": "make test"
     }
 }

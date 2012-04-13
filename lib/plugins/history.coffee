@@ -27,9 +27,9 @@ module.exports = (settings) ->
     # Persist readline history
     settings.dir ?= "#{process.env['HOME']}/.node_shell"
     settings.name ?= hash process.argv[1]
-    file ?= "#{settings.dir}/#{settings.file}"
+    file = "#{settings.dir}/#{settings.file}"
     # Create store directory
-    fs.mkdirSync settings.dir, 0700 unless path.existsSync settings.dir
+    fs.mkdirSync settings.dir, 0o0700 unless path.existsSync settings.dir
     # Look for previous history
     if path.existsSync file
         try

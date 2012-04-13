@@ -1,15 +1,15 @@
 
+should = require 'should'
 shell = require '..'
-assert = require 'assert'
 styles = require '../lib/styles'
 
-module.exports = 
-    'Confirm # yes and no': (next) ->
+describe 'req confirm', ->
+    it 'should provide a boolean', (next) ->
         stdin = new shell.NullStream
         stdout = new shell.NullStream
         stdout.on 'data', (data) ->
             return unless data.trim()
-            assert.eql styles.unstyle(data), 'Do u confirm? [Yn] '
+            styles.unstyle(data).should.eql 'Do u confirm? [Yn] '
             @answer = !@answer
             stdin.emit 'data', if @answer then 'y' else 'N'
         app = shell
@@ -21,7 +21,7 @@ module.exports =
             app.use shell.router shell: app
         app.cmd 'test string', (req, res) ->
             req.confirm 'Do u confirm?', (value) ->
-                assert.eql value, true
+                value.should.eql true
                 req.confirm 'Do u confirm?', (value) ->
-                    assert.eql value, false
+                    value.should.eql false
                     next()
