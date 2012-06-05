@@ -78,7 +78,7 @@ match = (req, routes, i) ->
         i++
     null
 
-module.exports = router = (settings) ->
+module.exports = (settings) ->
     # Validation
     throw new Error 'No shell provided' if not settings.shell
     shell = settings.shell
@@ -112,7 +112,7 @@ module.exports = router = (settings) ->
     # Register 'quit' command
     shell.cmd 'quit', 'Exit this shell', shell.quit.bind shell
     # middleware
-    router = (req, res, next) ->
+    (req, res, next) ->
         route = null
         self = this
         i = 0

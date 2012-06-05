@@ -47,7 +47,7 @@ app.configure(function() {
 module.exports = () ->
     settings = {}
     cmd = () ->
-        searchs = if settings.path then [settings.path] else ['server', 'app']
+        searchs = if settings.path then [settings.path] else ['app', 'server', 'lib/app', 'lib/server']
         for search in searchs
             search = path.resolve settings.workspace, search
             if path.existsSync "#{search}"
@@ -59,16 +59,6 @@ module.exports = () ->
             else if path.existsSync "#{search}.coffee"
                 return "coffee #{search}.coffee"
         throw new Error 'Failed to discover a "server.js" or "app.js" file'
-        # return "node #{path.resolve settings.workspace, settings.path}" if settings.path
-        # if path.existsSync "#{settings.workspace}/server.js"
-        #     "node #{settings.workspace}/server"
-        # else if path.existsSync "#{settings.workspace}/server.coffee"
-        #     "coffee #{settings.workspace}/server.coffee"
-        # else if path.existsSync "#{settings.workspace}/app.js"
-        #     "node #{settings.workspace}/app"
-        # else if path.existsSync "#{settings.workspace}/app.coffee"
-        #     "coffee #{settings.workspace}/app.coffee"
-        # else throw new Error 'Failed to discover a "server.js" or "app.js" file'
     http = null
     # Register commands
     route = (req, res, next) ->
