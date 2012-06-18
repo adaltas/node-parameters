@@ -58,8 +58,10 @@ module.exports = start_stop =
                     if code isnt 0
                         msg = "Process exit with code #{code}"
                         return callback new Error msg
-                    fs.writeFile options.pidfile, '' + pid, (err) ->
-                        callback null, pid
+                    path.exists path.dirname(options.pidfile), (exists) ->
+                        return callback new Error "Pid directory does not exist" unless exists
+                        fs.writeFile options.pidfile, '' + pid, (err) ->
+                            callback null, pid
             # Do the job
             start_stop.pid options, (err, pid) ->
                 return start callback unless pid

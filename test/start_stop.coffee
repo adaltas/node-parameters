@@ -61,6 +61,13 @@ describe 'StartStop', ->
                     path.exists pidfile, (exists) ->
                         exists.should.be.false
                         next()
+    it 'should throw an error if pidfile is not in a existing directory', (next) ->
+        cmd = "node #{__dirname}/start_stop/server.js"
+        pidfile = "#{__dirname}/doesnotexist/pidfile"
+        start_stop.start cmd:cmd, pidfile: pidfile, (err, stoped) ->
+            err.should.be.an.instanceof Error
+            err.message.should.eql 'Pid directory does not exist'
+            next()
     it 'Test attach', (next) ->
         cmd = "#{__dirname}/start_stop/server.js"
         # Start the process
@@ -79,3 +86,4 @@ describe 'StartStop', ->
                         should.not.exist err
                         exists.should.be.false
                         next()
+
