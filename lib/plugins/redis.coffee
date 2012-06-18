@@ -9,7 +9,7 @@ Register two commands, `redis start` and `redis stop`. The following properties 
 
 -   `config`   , Path to the configuration file. Required to launch redis.
 -   `attach`   , Wether the Redis process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
--   `pidfile` Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
+-   `pidfile`  , Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
 -   `stdout`   , Writable stream or file path to redirect cloud9 stdout.
 -   `stderr`   , Writable stream or file path to redirect cloud9 stderr.
 
