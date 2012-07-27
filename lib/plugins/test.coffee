@@ -1,5 +1,7 @@
 
+fs = require 'fs'
 path = require 'path'
+existsSync = fs.existsSync or path.existsSync
 exec = require('child_process').exec
 
 module.exports = (settings) ->
@@ -30,7 +32,7 @@ module.exports = (settings) ->
                 res.prompt()
         paths = [].concat module.paths, require.paths
         for p in paths
-            if path.existsSync p + '/expresso/bin/expresso'
+            if existsSync p + '/expresso/bin/expresso'
                 return run p
         res.magenta('Expresso not found').ln()
         res.prompt()

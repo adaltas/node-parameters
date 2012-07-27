@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
-    var shell = require('shell');
+    var shell = require('../..');
     var exec = require('child_process').exec;
 
-    var app = new shell();
+    var app = shell();
     app.configure(function(){
         app.use(shell.router({
             shell: app

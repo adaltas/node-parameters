@@ -26,6 +26,7 @@ module.exports = class Request
             q = "#{question.name} "
             q += "[#{question.value}] " if question.value
             @shell.interface().question q, (answer) ->
+                answer = answer.substr(0, answer.length - 1) if answer.substr(-1, 1) is '\n'
                 answers[question.name] = 
                     if answer is '' then question.value else answer
                 next()
@@ -51,6 +52,7 @@ module.exports = class Request
         question = @shell.styles.raw( msg, {color: 'green'})
         @shell.interface().question question, (answer) =>
             accepted = ['', key_true, key_false]
+            answer = answer.substr(0, answer.length - 1) if answer.substr(-1, 1) is '\n'
             answer = answer.toLowerCase()
             valid = accepted.indexOf(answer) isnt -1
             return @confirm.apply(@, args) unless valid

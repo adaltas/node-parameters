@@ -1,6 +1,5 @@
 
 fs = require 'fs'
-path = require 'path'
 crypto = require 'crypto'
 Interface = require('readline').Interface
 
@@ -29,9 +28,9 @@ module.exports = (settings) ->
     settings.name ?= hash process.argv[1]
     file = "#{settings.dir}/#{settings.file}"
     # Create store directory
-    fs.mkdirSync settings.dir, 0o0700 unless path.existsSync settings.dir
+    fs.mkdirSync settings.dir, 0o0700 unless fs.existsSync settings.dir
     # Look for previous history
-    if path.existsSync file
+    if fs.existsSync file
         try
             json = fs.readFileSync(file, 'utf8') or '[]'
             settings.shell.interface().history = JSON.parse json

@@ -1,5 +1,7 @@
 
+fs = require 'fs'
 path = require 'path'
+existsSync = fs.existsSync or path.existsSync
 start_stop = require '../start_stop'
 ###
 
@@ -50,13 +52,13 @@ module.exports = () ->
         searchs = if settings.path then [settings.path] else ['app', 'server', 'lib/app', 'lib/server']
         for search in searchs
             search = path.resolve settings.workspace, search
-            if path.existsSync "#{search}"
+            if existsSync "#{search}"
                 if search.substr(-4) is '.coffee'
                 then return "coffee #{search}"
                 else return "node #{search}"
-            if path.existsSync "#{search}.js"
+            if existsSync "#{search}.js"
                 return "node #{search}.js"
-            else if path.existsSync "#{search}.coffee"
+            else if existsSync "#{search}.coffee"
                 return "coffee #{search}.coffee"
         throw new Error 'Failed to discover a "server.js" or "app.js" file'
     http = null

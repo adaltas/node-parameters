@@ -12,6 +12,7 @@ module.exports = class NullStream extends events.EventEmitter
     write: (data) ->
         @emit 'data', data
     end: ->
+        @emit 'close'
     # Shared API
     destroy: ->
     destroySoon: ->

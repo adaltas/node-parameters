@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-    var shell = require('shell'),
+    var shell = require('../..'),
         app = shell(),
         users = {
             '1': 'lulu',

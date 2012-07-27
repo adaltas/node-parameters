@@ -3,6 +3,7 @@ crypto = require 'crypto'
 {exec} = require 'child_process'
 fs = require 'fs'
 path = require 'path'
+exists = fs.exists or path.exists
 
 md5 = (cmd) -> crypto.createHash('md5').update(cmd).digest('hex')
 
@@ -58,7 +59,7 @@ module.exports = start_stop =
                     if code isnt 0
                         msg = "Process exit with code #{code}"
                         return callback new Error msg
-                    path.exists path.dirname(options.pidfile), (exists) ->
+                    exists path.dirname(options.pidfile), (exists) ->
                         return callback new Error "Pid directory does not exist" unless exists
                         fs.writeFile options.pidfile, '' + pid, (err) ->
                             callback null, pid
@@ -202,14 +203,22 @@ module.exports = start_stop =
     ###
     file: (options, callback) ->
         return callback null, null, false if options.attach
-        unless options.pidfile
+        start = ->
+            return pidFileExists() if options.pidfile
             dir = path.resolve process.env['HOME'], '.node_shell'
             file = md5 options.cmd
-            createDir = not path.existsSync dir
-            fs.mkdirSync dir, 0o0700 if createDir
             options.pidfile = "#{dir}/#{file}.pid"
-        path.exists options.pidfile, (exists) ->
-            callback null, options.pidfile, exists
+            exists dir, (dirExists) ->
+                return createDir() unless dirExists
+                pidFileExists()
+        createDir = ->
+            fs.mkdir dir, 0o0700, (err) ->
+                return callback err if err
+                pidFileExists()
+        pidFileExists = ->
+            exists options.pidfile, (pidFileExists) ->
+                callback null, options.pidfile, pidFileExists
+        start()
     
     ###
 

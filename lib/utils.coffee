@@ -1,5 +1,7 @@
 
+fs = require 'fs'
 path = require 'path'
+existsSync = fs.existsSync or path.existsSync
 
 module.exports =
     flatten: (arr, ret) ->
@@ -15,7 +17,7 @@ module.exports =
         #dirs = require('module')._nodeModulePaths process.cwd()
         dirs = require('module')._nodeModulePaths process.argv[1]
         for dir in dirs
-            if path.existsSync(dir) || path.existsSync(path.normalize(dir + '/../package.json'))
+            if existsSync(dir) || existsSync(path.normalize(dir + '/../package.json'))
                 return path.normalize dir + '/..'
     checkPort: (port, host, callback) ->
         cmd = exec "nc #{host} #{port} < /dev/null"

@@ -10,8 +10,8 @@ describe 'req confirm', ->
         stdout.on 'data', (data) ->
             return unless data.trim()
             styles.unstyle(data).should.eql 'Do u confirm? [Yn] '
-            @answer = !@answer
-            stdin.emit 'data', if @answer then 'y' else 'N'
+            @answer = not @answer
+            stdin.emit 'data', new Buffer(if @answer then 'y\n' else 'N\n')
         app = shell
             workspace:  "#{__dirname}/plugins_http"
             command: 'test string'

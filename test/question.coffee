@@ -9,7 +9,7 @@ describe 'Request question', ->
         stdout.on 'data', (data) ->
             return unless data.trim()
             data.should.eql 'My question: '
-            stdin.emit 'data', 'My answer'
+            stdin.emit 'data', 'My answer\n'
         app = shell
             workspace:  "#{__dirname}/plugins_http"
             command: 'test string'
@@ -28,7 +28,7 @@ describe 'Request question', ->
         stdout.on 'data', (data) ->
             return unless data.trim()
             data.should.eql expects.shift()
-            stdin.emit 'data', "Value #{2 - expects.length}"
+            stdin.emit 'data', "Value #{2 - expects.length}\n"
         app = shell
             workspace:  "#{__dirname}/plugins_http"
             command: 'test array'
@@ -54,7 +54,7 @@ describe 'Request question', ->
         stdout.on 'data', (data) ->
             return unless data.trim()
             data.should.eql expects.shift()
-            stdin.emit 'data', "Value #{3 - expects.length}"
+            stdin.emit 'data', "Value #{3 - expects.length}\n"
         app = shell
             workspace:  "#{__dirname}/plugins_http"
             command: 'test object'

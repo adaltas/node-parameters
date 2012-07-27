@@ -14,7 +14,7 @@
         "email": "https://github.com/russfrank"
     }],
     "engines": {
-        "node": ">= 0.1.90"
+        "node": ">= 0.8.0"
     },
     "dependencies": {
         "coffee-script": "latest",

@@ -1,5 +1,4 @@
 
-fs = require 'fs'
 path = require 'path'
 start_stop = require '../start_stop'
 
