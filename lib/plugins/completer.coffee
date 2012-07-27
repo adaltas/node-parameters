@@ -15,12 +15,12 @@ module.exports = (settings) ->
     shell = settings.shell
     # Plug completer to interface
     return unless shell.isShell
-    shell.interface().completer = (text) ->
+    shell.interface().completer = (text, cb) ->
         suggestions = []
         routes = shell.routes
         for route in routes
             command = route.command
             if command.substr(0, text.length) is text
                 suggestions.push command
-        [suggestions, text]
+        cb(false, [suggestions, text])
     null
