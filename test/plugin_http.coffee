@@ -4,14 +4,14 @@ http = require 'http'
 shell = require '..'
 
 describe 'Plugin HTTP', ->
-    it 'should start and stop an HTTP server', (next) ->
+    it 'should start and stop an HTTP server in attach mode', (next) ->
         app = shell
             workspace:  "#{__dirname}/plugin_http"
             command: null
             stdin: new shell.NullStream
             stdout: new shell.NullStream
         app.configure ->
-            app.use shell.http attach: true
+            app.use shell.http detached: false
             app.use shell.router shell: app
         app.run 'http start'
         setTimeout ->

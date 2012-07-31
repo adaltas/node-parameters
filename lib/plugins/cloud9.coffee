@@ -19,7 +19,7 @@ Options:
 -   `ip`       , IP address where Cloud9 will serve from. Defaults to `"127.0.0.1"`.
 -   `port`     , Port number where Cloud9 will serve from. Defaults to `3000`.
 -   `workspace`, Path to the workspace that will be loaded in Cloud9, Defaults to `Shell.set('workspace')`.
--   `attach`   , Wether the Cloud9 process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-   `detached` , Wether the Cloud9 process should be attached to the current process. If not defined, default to `false` (the server doesn't run as a daemon).
 -   `pidfile`  , Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
 -   `stdout`   , Writable stream or file path to redirect cloud9 stdout.
 -   `stderr`   , Writable stream or file path to redirect cloud9 stderr.

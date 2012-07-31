@@ -18,7 +18,7 @@
             stdout: __dirname + '/logs/http.out.log',
             stderr: __dirname + '/logs/http.err.log',
             pidfile: __dirname + '/tmp/http.pid',
-            attach: false
+            detached: true
         }));
         app.use(shell.router({shell: app}));
         app.use(shell.help({shell: app, introduction: true}));

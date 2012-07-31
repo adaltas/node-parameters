@@ -26,7 +26,7 @@ Options:
 -   `output`   , Directory where compiled JavaScript files are written. Used in conjunction with "compile".
 -   `lint`     , If the `jsl` (JavaScript Lint) command is installed, use it to check the compilation of a CoffeeScript file.
 -   `require`  , Load a library before compiling or executing your script. Can be used to hook in to the compiler (to add Growl notifications, for example).
--   `attach`   , Wether the Coffee process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-   `detached` , Wether the Coffee process should be attached to the current process. If not defined, default to `false` (the server doesn't run as a daemon).
 -   `pidfile`  , Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
 -   `stdout`   , Writable stream or file path to redirect cloud9 stdout.
 -   `stderr`   , Writable stream or file path to redirect cloud9 stderr.

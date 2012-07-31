@@ -22,7 +22,7 @@ The following properties may be provided as settings:
 
 Properties derived from the start_stop utility:   
 
--   `attach`        Wether the HTTP process should be attached to the current process. If not defined, default to `false` (the server run as a daemon).
+-   `detached`      Wether the HTTP process should be attached to the current process. If not defined, default to `false` (the server doesn't run as a daemon).
 -   `pidfile`       Path to the file storing the daemon process id. Defaults to `"/.node_shell/#{md5}.pid"`
 -   `stdout`        Writable stream or file path to redirect the server stdout.
 -   `stderr`        Writable stream or file path to redirect the server stderr.

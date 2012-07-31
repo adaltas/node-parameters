@@ -17,7 +17,8 @@ app.configure(function() {
     }));
     app.use(shell.redis({
         config: 'redis.conf',
-        pidfile: 'redis.pid'
+        pidfile: 'redis.pid',
+        detached: true
     }));
     app.use(shell.router({
         shell: app

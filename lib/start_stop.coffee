@@ -1,6 +1,6 @@
 
 crypto = require 'crypto'
-{exec} = require 'child_process'
+{exec, spawn} = require 'child_process'
 fs = require 'fs'
 path = require 'path'
 exists = fs.exists or path.exists
@@ -27,7 +27,7 @@ module.exports = start_stop =
 
     `options`           , Object with the following properties:
     *   `cmd`           , Command to run
-    *   `attach`        , Attach the child process to the current process
+    *   `detached`      , Detached the child process from the current process
     *   `pidfile`       , Path to the file storing the child pid
     *   `stdout`        , Path to the file where standard output is redirected
     *   `stderr`        , Path to the file where standard error is redirected
@@ -40,7 +40,10 @@ module.exports = start_stop =
 
     ###
     start: (options, callback) ->
-        unless options.attach
+        if options.attach?
+            console.log 'Option attach was renamed to attached to be consistent with the new spawn option'
+            options.detached = not options.attach
+        if options.detached
             cmdStdout =
                 if typeof options.stdout is 'string' 
                 then options.stdout else '/dev/null'
@@ -99,7 +102,7 @@ module.exports = start_stop =
     not provided, can be guessed from the `cmd` option used to start the process.
 
     `options`           , Object with the following properties:
-    *   `attach`        , Attach the child process to the current process
+    *   `detached`      , Detach the child process to the current process
     *   `cmd`           , Command used to run the process, in case no pidfile is provided
     *   `pid`           , Pid to kill in attach mode
     *   `pidfile`       , Path to the file storing the child pid
@@ -112,8 +115,12 @@ module.exports = start_stop =
 
     ###
     stop: (options, callback) ->
+        if options.attach?
+            console.log 'Option attach was renamed to attached to be consistent with the new spawn option'
+            options.detached = not options.attach
+        # Stoping a provided PID
         if typeof options is 'string' or typeof options is 'number'
-            options = {pid: parseInt(options, 10), attach: true}
+            options = {pid: parseInt(options, 10), detached: false}
         kill = (pid, callback) ->
             # Not trully recursive, potential scripts:
             # http://machine-cycle.blogspot.com/2009/05/recursive-kill-kill-process-tree.html
@@ -127,7 +134,7 @@ module.exports = start_stop =
             """
             exec cmds, (err, stdout, stderr) ->
                 callback err
-        unless options.attach
+        if options.detached
             start_stop.pid options, (err, pid) ->
                 return callback err if err
                 return callback null, false unless pid
@@ -155,9 +162,9 @@ module.exports = start_stop =
     otherwise it is set to false.
 
     `options`           , Object with the following properties:
-    *   `attach`        , True if the child process is attached to the current process
+    *   `detached`      , True if the child process is not attached to the current process
     *   `cmd`           , Command used to run the process, in case no pidfile is provided
-    *   `pid`           , Pid to kill in attach mode
+    *   `pid`           , Pid to kill if not running in detached mode
     *   `pidfile`       , Path to the file storing the child pid
 
 
@@ -168,8 +175,11 @@ module.exports = start_stop =
     
     ###
     pid: (options, callback) ->
+        if options.attach?
+            console.log 'Option attach was renamed to attached to be consistent with the new spawn option'
+            options.detached = not options.attach
         # Attach mode
-        if options.attach
+        unless options.detached
             return new Error 'Expect a pid property in attached mode' unless options.pid?
             return callback null, options.pid
         # Deamon mode
@@ -190,7 +200,7 @@ module.exports = start_stop =
     argument with a pidfile property unless already present.
 
     `options`           , Object with the following properties:
-    *   `attach`        , True if the child process is attached to the current process
+    *   `detached`      , True if the child process is not attached to the current process
     *   `cmd`           , Command used to run the process, in case no pidfile is provided
     *   `pid`           , Pid to kill in attach mode
     *   `pidfile`       , Path to the file storing the child pid
@@ -202,7 +212,10 @@ module.exports = start_stop =
 
     ###
     file: (options, callback) ->
-        return callback null, null, false if options.attach
+        if options.attach?
+            console.log 'Option attach was renamed to detached to be consistent with the spawn API'
+            options.detached = not options.attach
+        return callback null, null, false unless options.detached
         start = ->
             return pidFileExists() if options.pidfile
             dir = path.resolve process.env['HOME'], '.node_shell'

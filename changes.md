@@ -2,6 +2,34 @@
 List of API changes and enhancements
 ====================================
 
+Version 0.2.9
+-------------
+
+Rename `attach` option to `detached` in start_stop
+
+Version 0.2.8
+-------------
+
+Broader Node.js requirement to 0.6
+
+Version 0.2.7
+-------------
+
+Fix Win7 completion (by [t101jv](https://github.com/t101jv))
+Fix compatibility with Node.js version 0.8
+
+Version 0.2.6
+-------------
+
+Reflect latest CoffeeScript strict mode
+
+Version 0.2.5
+-------------
+
+Add cmd and path options to http plugin
+Stylus plugin
+StartStop script improvement
+
 Version 0.2.4
 -------------
 

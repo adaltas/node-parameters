@@ -6,10 +6,10 @@ should = require 'should'
 start_stop = require '../lib/start_stop'
 
 describe 'StartStop', ->
-    it 'Test daemon # start and stop', (next) ->
+    it 'should detach a child, start and stop', (next) ->
         cmd = "node #{__dirname}/start_stop/server.js"
         # Start the process
-        start_stop.start cmd: cmd, (err, pid) ->
+        start_stop.start cmd: cmd, detached: true, (err, pid) ->
             should.not.exist err
             pid.should.be.a 'number'
             # Check if process started
@@ -17,21 +17,21 @@ describe 'StartStop', ->
                 should.not.exist err
                 running.should.be.true
                 # Stop process
-                start_stop.stop cmd: cmd, (err) ->
+                start_stop.stop cmd: cmd, detached: true, (err) ->
                     should.not.exist err
                     # Check if process stoped
                     start_stop.running pid, (err, running) ->
                         should.not.exist err
                         running.should.be.false
                         next()
-    it 'Test daemon # stop inactive process', (next) ->
+    it 'should detach a child and stop inactive process', (next) ->
         cmd = "node #{__dirname}/start_stop/server.js"
         # Stop process
-        start_stop.stop cmd:cmd, (err, stoped) ->
+        start_stop.stop cmd:cmd, detached: true, (err, stoped) ->
             should.not.exist err
             stoped.should.be.false
             next()
-    it 'Test daemon # stop inactive process with pidfile # relax', (next) ->
+    it 'should detach a child and stop inactive process with pidfile', (next) ->
         cmd = "node #{__dirname}/start_stop/server.js"
         pidfile = "#{__dirname}/start_stop/pidfile"
         fs.writeFile pidfile, "1234567", (err) ->
@@ -40,14 +40,18 @@ describe 'StartStop', ->
                 should.not.exist err
                 running.should.be.false
                 # Stop process
-                start_stop.stop {cmd:cmd, pidfile: pidfile}, (err, stoped) ->
+                start_stop.stop cmd:cmd, pidfile: pidfile, detached: true, (err, stoped) ->
                     should.not.exist err
                     stoped.should.be.false
                     # Pidfile shall be removed even if pid is invalid
                     exists pidfile, (running) ->
                         running.should.be.false
                         next()
-    it 'Test daemon # stop inactive process with pidfile # strict', (next) ->
+    it 'should detach a child and honor the strict option', (next) ->
+        # From the API
+        # Send an error when a pid file exists and reference an unrunning pid.
+        # Exist both in the start and stop functions
+        # todo: test in start function
         cmd = "node #{__dirname}/start_stop/server.js"
         pidfile = "#{__dirname}/start_stop/pidfile"
         fs.writeFile pidfile, "1234567", (err) ->
@@ -56,23 +60,23 @@ describe 'StartStop', ->
                 should.not.exist err
                 running.should.be.false
                 # Stop process
-                start_stop.stop {cmd:cmd, pidfile: pidfile, strict: true}, (err, stoped) ->
+                start_stop.stop cmd:cmd, pidfile: pidfile, strict: true, detached: true, (err, stoped) ->
                     err.should.be.an.instanceof Error
                     # Pidfile shall be removed even if pid is invalid
                     exists pidfile, (running) ->
                         running.should.be.false
                         next()
-    it 'should throw an error if pidfile is not in a existing directory', (next) ->
+    it 'should detach a child and throw an error if pidfile not in directory', (next) ->
         cmd = "node #{__dirname}/start_stop/server.js"
         pidfile = "#{__dirname}/doesnotexist/pidfile"
-        start_stop.start cmd:cmd, pidfile: pidfile, (err, stoped) ->
+        start_stop.start cmd:cmd, pidfile: pidfile, detached: true, (err, stoped) ->
             err.should.be.an.instanceof Error
             err.message.should.eql 'Pid directory does not exist'
             next()
-    it 'Test attach', (next) ->
+    it 'should attach a child', (next) ->
         cmd = "node #{__dirname}/start_stop/server.js"
         # Start the process
-        start_stop.start {cmd: cmd, attach: true}, (err, pid) ->
+        start_stop.start cmd: cmd, detached: false, (err, pid) ->
             should.not.exist err
             pid.should.be.a 'number'
             # Check if process started
