@@ -23,20 +23,24 @@ module.exports = start_stop =
 
     `start(options, callback)`
     --------------------------
-    Start a prcess as a daemon (default) or as a child of the current process.
+    Start a prcess as a daemon (default) or as a child of the current process. Options includes
+    all the options of the "child_process.exec" function plus a few specific ones.
 
-    `options`           , Object with the following properties:
-    *   `cmd`           , Command to run
-    *   `detached`      , Detached the child process from the current process
-    *   `pidfile`       , Path to the file storing the child pid
-    *   `stdout`        , Path to the file where standard output is redirected
-    *   `stderr`        , Path to the file where standard error is redirected
-    *   `strict`        , Send an error when a pid file exists and reference
-                          an unrunning pid.
+    `options`               , Object with the following properties:
+    *   `cmd`               , Command to run
+    *   `cwd`               , Current working directory of the child process
+    *   `detached`          , Detached the child process from the current process
+    *   `pidfile`           , Path to the file storing the child pid
+    *   `stdout`            , Path to the file where standard output is redirected
+    *   `stderr`            , Path to the file where standard error is redirected
+    *   `strict`            , Send an error when a pid file exists and reference
+                              an unrunning pid.
+    *   `watch`             , Watch for file changes
+    *   `watchIgnore`       , List of ignore files
     
-    `callback`          , Received arguments are:
-    *   `err`           , Error if any
-    *   `pid`           , Process id of the new child
+    `callback`              , Received arguments are:
+    *   `err`               , Error if any
+    *   `pid`               , Process id of the new child
 
     ###
     start: (options, callback) ->
@@ -44,18 +48,55 @@ module.exports = start_stop =
             console.log 'Option attach was renamed to attached to be consistent with the new spawn option'
             options.detached = not options.attach
         if options.detached
+            child = null
             cmdStdout =
                 if typeof options.stdout is 'string' 
                 then options.stdout else '/dev/null'
             cmdStderr =
                 if typeof options.stderr is 'string'
                 then options.stderr else '/dev/null'
+            check_pid = ->
+                start_stop.pid options, (err, pid) ->
+                    return watch() unless pid
+                    start_stop.running pid, (err, pid) ->
+                        return callback new Error "Pid #{pid} already running" if pid
+                        # Pid file reference an unrunning process
+                        if options.strict
+                        then callback new Error "Pid file reference a dead process"
+                        else watch()
+            watch = ->
+                return start() unless options.watch
+                options.watch = options.cwd or process.cwd unless typeof options.watch is 'string'
+                ioptions =
+                    path: options.watch
+                    ignoreFiles: [".startstopignore"] or options.watchIgnoreFiles
+                console.log 'ioptions', ioptions
+                ignore = require 'fstream-ignore'
+                ignore(ioptions)
+                .on 'child', (c) ->
+                    console.log c.path 
+                    # c.on 'ignoreFile', (path, content) ->
+                    #     console.log 'ignore', path, content.toString()
+                    fs.watchFile c.path, (curr, prev) ->
+                        console.log c.path 
+                        start_stop.stop options, (e) ->
+                            start_stop.start options, (e) ->
+                                console.log 'restarted', e
+                        # a file has changed, restart the child process
+                        # child.kill('SIGHUP')
+                        # child.on 'exit', (code, signal) ->
+                        #     console.log('child process terminated due to receipt of signal '+signal)
+                        #     start()
+                # .on 'ignoreFile', (path, content) ->
+                #     console.log 'ignore', path, content.toString()
+
+                start()
             # Start the process
-            start = (callback) ->
+            start = ->
                 pipe = "</dev/null >#{cmdStdout} 2>#{cmdStdout}"
                 info = 'echo $? $!'
                 cmd = "#{options.cmd} #{pipe} & #{info}"
-                exec cmd, (err, stdout, stderr) ->
+                child = exec cmd, options, (err, stdout, stderr) ->
                     [code, pid] = stdout.split(' ')
                     code = parseInt code, 10
                     pid = parseInt pid, 10
@@ -67,14 +108,7 @@ module.exports = start_stop =
                         fs.writeFile options.pidfile, '' + pid, (err) ->
                             callback null, pid
             # Do the job
-            start_stop.pid options, (err, pid) ->
-                return start callback unless pid
-                start_stop.running pid, (err, pid) ->
-                    callback new Error "Pid #{pid} already running" if pid
-                    # Pid file reference an unrunning process
-                    if options.strict
-                    then callback new Error "Pid file reference a dead process"
-                    else start callback
+            check_pid()
         else # Kill child on exit if started in attached mode
             c = exec options.cmd
             if typeof options.stdout is 'string'
@@ -101,17 +135,17 @@ module.exports = start_stop =
     Stop a process. In daemon mode, the pid is obtained from the `pidfile` option which, if 
     not provided, can be guessed from the `cmd` option used to start the process.
 
-    `options`           , Object with the following properties:
-    *   `detached`      , Detach the child process to the current process
-    *   `cmd`           , Command used to run the process, in case no pidfile is provided
-    *   `pid`           , Pid to kill in attach mode
-    *   `pidfile`       , Path to the file storing the child pid
-    *   `strict`        , Send an error when a pid file exists and reference
-                          an unrunning pid.
+    `options`               , Object with the following properties:
+    *   `detached`          , Detach the child process to the current process
+    *   `cmd`               , Command used to run the process, in case no pidfile is provided
+    *   `pid`               , Pid to kill in attach mode
+    *   `pidfile`           , Path to the file storing the child pid
+    *   `strict`            , Send an error when a pid file exists and reference
+                              an unrunning pid.
     
-    `callback`          , Received arguments are:
-    *   `err`           , Error if any
-    *   `stoped`        , True if the process was stoped
+    `callback`              , Received arguments are:
+    *   `err`               , Error if any
+    *   `stoped`            , True if the process was stoped
 
     ###
     stop: (options, callback) ->
@@ -121,7 +155,7 @@ module.exports = start_stop =
         # Stoping a provided PID
         if typeof options is 'string' or typeof options is 'number'
             options = {pid: parseInt(options, 10), detached: false}
-        kill = (pid, callback) ->
+        kill = (pid) ->
             # Not trully recursive, potential scripts:
             # http://machine-cycle.blogspot.com/2009/05/recursive-kill-kill-process-tree.html
             # http://unix.derkeiler.com/Newsgroups/comp.unix.shell/2004-05/1108.html
@@ -133,7 +167,9 @@ module.exports = start_stop =
             kill #{pid}
             """
             exec cmds, (err, stdout, stderr) ->
-                callback err
+                return callback new Error "Unexpected exit code #{err.code}" if err
+                options.pid = null
+                callback null, true
         if options.detached
             start_stop.pid options, (err, pid) ->
                 return callback err if err
@@ -145,14 +181,9 @@ module.exports = start_stop =
                             return if options.strict
                             then callback new Error "Pid file reference a dead process"
                             else callback null, false
-                        kill pid, (err, stdout, stderr) ->
-                            return callback err if err
-                            callback null, true
+                        kill pid
         else
-            kill options.pid, (err) ->
-                return callback new Error "Unexpected exit code #{err.code}" if err
-                options.pid = false
-                callback null, true
+            kill options.pid
     
     ###
 
@@ -248,7 +279,6 @@ module.exports = start_stop =
 
     ###
     running: (pid, callback) ->
-        # exec "ps -ef | grep #{pid} | grep -v grep", (err, stdout, stderr) ->
         exec "ps -ef #{pid} | grep -v PID", (err, stdout, stderr) ->
             return callback err if err and err.code isnt 1
             callback null, not err

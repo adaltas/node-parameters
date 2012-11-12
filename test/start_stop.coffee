@@ -91,4 +91,23 @@ describe 'StartStop', ->
                         should.not.exist err
                         running.should.be.false
                         next()
+    # it 'should detach a child and restart on change', (next) ->
+    #     cmd = "node #{__dirname}/start_stop/server.js"
+    #     start_stop.start cmd: cmd, detached: true, watch: true, (err, pid) ->
+    #         should.not.exist err
+    #         pid.should.be.a 'number'
+    #         # Check if process started
+    #         start_stop.running pid, (err, running) ->
+    #             should.not.exist err
+    #             running.should.be.true
+    #             # Stop process
+    #             start_stop.stop pid, (err) ->
+    #                 should.not.exist err
+    #                 # Check if process stoped
+    #                 start_stop.running pid, (err, running) ->
+    #                     should.not.exist err
+    #                     running.should.be.false
+    #                     next()
+
+
 

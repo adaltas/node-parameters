@@ -19,7 +19,8 @@
     "dependencies": {
         "coffee-script": "latest",
         "each": "latest",
-        "pad": "latest"
+        "pad": "latest",
+        "optimist": "latest"
     },
     "devDependencies": {
         "mocha": "latest",
