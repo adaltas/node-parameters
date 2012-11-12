@@ -10,17 +10,21 @@ similar functionality to console based applications.
 * Command matching, parameters and advanced functionnalities found in Express routing
 * Flexible architecture based on middlewares for plugin creation and routing enhancement
 * Familiar API for those of us using Connect or Express
-* Predifined commands with plugins for Redis, HTTP servers, Cloud9, CoffeeScript, ...
+* Predifined commands through plugins for Redis, HTTP servers, Cloud9, CoffeeScript, ...
 
-## Installation
+Installation
+------------
 
 Shell is open source and licensed under the new BSD license.
 
 ```bash
-    npm install shell
+npm install shell
 ```
 
-## Example: a simple Redis client
+Quick start
+-----------
+
+The example below illustrate how to code a simple Redis client.
 
 ```javascript
 var shell = require('shell');
@@ -28,57 +32,59 @@ var shell = require('shell');
 var app = new shell( { chdir: __dirname } )
 // Middleware registration
 app.configure(function() {
-    app.use(function(req, res, next){
-        app.client = require('redis').createClient()
-        next()
-    });
-    app.use(shell.history({
-        shell: app
-    }));
-    app.use(shell.completer({
-        shell: app
-    }));
-    app.use(shell.redis({
-        config: 'redis.conf',
-        pidfile: 'redis.pid'
-    }));
-    app.use(shell.router({
-        shell: app
-    }));
-    app.use(shell.help({
-        shell: app,
-        introduction: true
-    }));
+  app.use(function(req, res, next){
+    app.client = require('redis').createClient()
+    next()
+  });
+  app.use(shell.history({
+    shell: app
+  }));
+  app.use(shell.completer({
+    shell: app
+  }));
+  app.use(shell.redis({
+    config: 'redis.conf',
+    pidfile: 'redis.pid'
+  }));
+  app.use(shell.router({
+    shell: app
+  }));
+  app.use(shell.help({
+    shell: app,
+    introduction: true
+  }));
 });
 // Command registration
 app.cmd('redis keys :pattern', 'Find keys', function(req, res, next){
-    app.client.keys(req.params.pattern, function(err, keys){
-        if(err){ return res.styles.red(err.message), next(); }
-        res.cyan(keys.join('\n')||'no keys');
-        res.prompt();
-    });
+  app.client.keys(req.params.pattern, function(err, keys){
+    if(err){ return res.styles.red(err.message), next(); }
+    res.cyan(keys.join('\n')||'no keys');
+    res.prompt();
+  });
 });
 // Event notification
 app.on('quit', function(){
-    app.client.quit();
+  app.client.quit();
 });
 ```
 
-## Creating and Configuring a Shell
+Creating and Configuring a Shell
+--------------------------------
 
 ```javascript
 var app = shell();
 app.configure(function() {
-    app.use(shell.history({shell: app}));
-    app.use(shell.completer({shell: app}));
-    app.use(shell.help({shell: app, introduction: true}));
+  app.use(shell.history({shell: app}));
+  app.use(shell.completer({shell: app}));
+  app.use(shell.help({shell: app, introduction: true}));
 });
 app.configure('prod', function() {
-    app.set('title', 'Production Mode');
+  app.set('title', 'Production Mode');
 });
 ```
 
-## Shell settings
+Shell settings
+--------------
 
 The constructor `shell` takes an optional object. Options are:
 
@@ -95,11 +101,11 @@ Shell settings may be set by calling `app.set('key', value)`.  They can be retri
 
 ```javascript
 var app = new shell({
-    chdir: true
+  chdir: true
 });
 app.set('env', 'prod');
 app.configure('prod', function() {
-    console.log(app.set('env'));
+  console.log(app.set('env'));
 });
 ```
 
@@ -107,13 +113,15 @@ As with Express, `app.configure` allows the customization of plugins for all or 
 
 If `app.configure` is called without specifying the environment as the first argument, the provided callback is always called. Otherwise, the environment must match the `env` setting or the global variable `NODE_ENV`.
 
-## Middlewares and plugins
+Middlewares and plugins
+-----------------------
 
-Shell is build on a middleware architecute. When a command is issued, multiple callbacks are executed sequentially until one decide to stop the process  (calling `res.prompt()` or `shell.quit`. Those callbacks are called middlewares. A callback recieve 3 arguments: a `request` object, a `response` object and the next callback. Traditionnaly, `request` deals with `stdin` while `response` deals with `stdout`.
+Shell is build on a middleware architecture. When a command is issued, multiple callbacks are executed sequentially until one decide to stop the process  (calling `res.prompt()` or `shell.quit`. Those callbacks are called middlewares. A callback recieve 3 arguments: a `request` object, a `response` object and the next callback. Traditionnaly, `request` deals with `stdin` while `response` deals with `stdout`.
 
 A plugin is simply a function which configure and return a middleware. Same plugin also enrich the Shell application with new routes and functions.
 
-## Shell events
+Shell events
+------------
 
 The following events may be emitted:
 
@@ -123,7 +131,8 @@ The following events may be emitted:
 -   `"error"`    , called on error providing the error object as the first callback argument.
 -   `"exit"`     , called when the process exit.
 
-## Request parameter
+Request parameter
+-----------------
 
 The request object contains the following properties:
 
@@ -133,7 +142,8 @@ The request object contains the following properties:
 -   `qestion` , Ask questions with optionally suggested and default answers
 -   `confirm` , Ask a question expecting a boolean answer
 
-## Response parameter
+Response parameter
+------------------
 
 The response object inherits from styles containing methods for printing, coloring and bolding:
 
@@ -168,13 +178,14 @@ Display:
 -   `pad`        , Print a text with a fixed padding
 -   `raw`        , Return a text
 
-## Router plugin
+Router plugin
+-------------
 
 The functionality provided by the 'routes' module is very similar to that of
 express.  Options passed during creation are:
 
 -   `shell`     , (required) A reference to your shell application.
--	 `sensitive` , (optional) Defaults to `false`, set to `true` if the match should be case sensitive.
+-   `sensitive` , (optional) Defaults to `false`, set to `true` if the match should be case sensitive.
 
 New routes are defined with the `cmd` method. A route is made of pattern against which the user command is matched, an optional description and one or more route specific middlewares to handle the command. The pattern is either a string or a regular expression. Middlewares receive three parameters: a request object, a response object, and a function. Command parameters are substituted and made available in the `params` object of the request parameter.
 
@@ -184,43 +195,43 @@ keyword, as in express: `:id([0-9]+)`.  See the `list` route in the example:
 ```javascript
 var app = new shell();
 app.configure(function(){
-    app.use(shell.router({
-        shell: app
-    }));
+  app.use(shell.router({
+    shell: app
+  }));
 });
 
 // Route middleware
 var auth = function(req, res, next){
-	if(req.params.uid == process.getuid()){
-		next()
-	}else{
-		throw new Error('Not me');
-	}
+  if(req.params.uid == process.getuid()){
+    next()
+  }else{
+    throw new Error('Not me');
+  }
 }
 
 // Global parameter substitution
 app.param('uid', function(req, res, next){
-	exec('whoami', function(err, stdout, sdterr){
-		req.params.username = stdout;
-		next();
-	});
+  exec('whoami', function(err, stdout, sdterr){
+    req.params.username = stdout;
+    next();
+  });
 });
 
 // Simple command
 app.cmd('help', function(req, res){
-	res.cyan('Run this command `./ami user ' + process.getuid() + '`');
-	res.prompt()
+  res.cyan('Run this command `./ami user ' + process.getuid() + '`');
+  res.prompt()
 });
 
 // Command with parameter
 app.cmd('user :uid', auth, function(req, res){
-	res.cyan('Yes, you are ' + req.params.username);
+  res.cyan('Yes, you are ' + req.params.username);
 });
 
 // Command with contrained parameter
 app.cmd('user :id([0-9]+)', function(req, res) {
-   res.cyan('User id is ' + req.params.id);
-   res.prompt();
+  res.cyan('User id is ' + req.params.id);
+  res.prompt();
 });
 ```
 
