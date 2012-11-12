@@ -3,56 +3,56 @@ should = require 'should'
 shell = require '..'
 
 describe 'Plugin router', ->
-    it 'Test simple', (next) ->
-        app = shell
-            command: 'test simple'
-            stdin: new shell.NullStream
-            stdout: new shell.NullStream
-        app.configure ->
-            app.use shell.router shell: app
-        app.cmd 'test simple', (req, res) ->
-            next()
-    it 'Test param # string', (next) ->
-        app = shell
-            command: 'test my_value'
-            stdin: new shell.NullStream
-            stdout: new shell.NullStream
-        app.configure ->
-            app.use shell.router shell: app
-        app.cmd 'test :my_param', (req, res) ->
-            req.params.my_param.should.eql 'my_value'
-            next()
-    it 'Test param # special char', (next) ->
-        app = shell
-            command: 'test 12.32/abc'
-            stdin: new shell.NullStream
-            stdout: new shell.NullStream
-        app.configure ->
-            app.use shell.router shell: app
-        app.cmd 'test :my_param', (req, res) ->
-            req.params.my_param.should.eql '12.32/abc'
-            next()
-    it 'Test # param with restriction # ok', (next) ->
-        app = shell
-            command: 'test 9034'
-            stdin: new shell.NullStream
-            stdout: new shell.NullStream
-        app.configure ->
-            app.use shell.router shell: app
-        app.cmd 'test :my_param([0-9]+)', (req, res) ->
-            req.params.my_param.should.eql '9034'
-            next()
-        app.cmd 'test :my_param', (req, res) ->
-            should.be.ok false
-    it 'Test # param with restriction # error', (next) ->
-        app = shell
-            command: 'test abc'
-            stdin: new shell.NullStream
-            stdout: new shell.NullStream
-        app.configure ->
-            app.use shell.router shell: app
-        app.cmd 'test :my_param([0-9]+)', (req, res) ->
-            should.be.ok false
-        app.cmd 'test :my_param', (req, res) ->
-            next()
-        
+  it 'Test simple', (next) ->
+    app = shell
+      command: 'test simple'
+      stdin: new shell.NullStream
+      stdout: new shell.NullStream
+    app.configure ->
+      app.use shell.router shell: app
+    app.cmd 'test simple', (req, res) ->
+      next()
+  it 'Test param # string', (next) ->
+    app = shell
+      command: 'test my_value'
+      stdin: new shell.NullStream
+      stdout: new shell.NullStream
+    app.configure ->
+      app.use shell.router shell: app
+    app.cmd 'test :my_param', (req, res) ->
+      req.params.my_param.should.eql 'my_value'
+      next()
+  it 'Test param # special char', (next) ->
+    app = shell
+      command: 'test 12.32/abc'
+      stdin: new shell.NullStream
+      stdout: new shell.NullStream
+    app.configure ->
+      app.use shell.router shell: app
+    app.cmd 'test :my_param', (req, res) ->
+      req.params.my_param.should.eql '12.32/abc'
+      next()
+  it 'Test # param with restriction # ok', (next) ->
+    app = shell
+      command: 'test 9034'
+      stdin: new shell.NullStream
+      stdout: new shell.NullStream
+    app.configure ->
+      app.use shell.router shell: app
+    app.cmd 'test :my_param([0-9]+)', (req, res) ->
+      req.params.my_param.should.eql '9034'
+      next()
+    app.cmd 'test :my_param', (req, res) ->
+      should.be.ok false
+  it 'Test # param with restriction # error', (next) ->
+    app = shell
+      command: 'test abc'
+      stdin: new shell.NullStream
+      stdout: new shell.NullStream
+    app.configure ->
+      app.use shell.router shell: app
+    app.cmd 'test :my_param([0-9]+)', (req, res) ->
+      should.be.ok false
+    app.cmd 'test :my_param', (req, res) ->
+      next()
+    

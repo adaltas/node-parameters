@@ -1,37 +1,37 @@
 {
-    "name": "shell",
-    "version": "0.2.8",
-    "description": "Full features and pretty console applications",
-    "author": "David Worms <david@adaltas.com>",
-    "contributors": [{
-        "name": "David Worms",
-        "email": "david@adaltas.com"
-    },{
-        "name": "Tony",
-        "email": "https://github.com/Zearin"
-    },{
-        "name": "Russ Frank",
-        "email": "https://github.com/russfrank"
-    }],
-    "engines": {
-        "node": ">= 0.6.0"
-    },
-    "dependencies": {
-        "coffee-script": "latest",
-        "each": "latest",
-        "pad": "latest",
-        "optimist": "latest"
-    },
-    "devDependencies": {
-        "mocha": "latest",
-        "should": "latest"
-    },
-    "keywords": ["cli", "console", "colors", "xterm"],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/wdavidw/node-shell.git"
-    },
-    "scripts": {
-        "test": "make test"
-    }
+  "name": "shell",
+  "version": "0.2.8",
+  "description": "Full features and pretty console applications",
+  "author": "David Worms <david@adaltas.com>",
+  "contributors": [{
+    "name": "David Worms",
+    "email": "david@adaltas.com"
+  },{
+    "name": "Tony",
+    "email": "https://github.com/Zearin"
+  },{
+    "name": "Russ Frank",
+    "email": "https://github.com/russfrank"
+  }],
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "dependencies": {
+    "coffee-script": "latest",
+    "each": "latest",
+    "pad": "latest",
+    "optimist": "latest"
+  },
+  "devDependencies": {
+    "mocha": "latest",
+    "should": "latest"
+  },
+  "keywords": ["cli", "console", "colors", "xterm"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wdavidw/node-shell.git"
+  },
+  "scripts": {
+    "test": "make test"
+  }
 }

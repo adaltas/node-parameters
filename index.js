@@ -20,12 +20,12 @@ Shell.test = require('./lib/plugins/test');
 
 // Routes
 Shell.routes = {
-    confirm: require('./lib/routes/confirm'),
-    prompt: require('./lib/routes/prompt'),
-    shellOnly: require('./lib/routes/shellOnly')
+  confirm: require('./lib/routes/confirm'),
+  prompt: require('./lib/routes/prompt'),
+  shellOnly: require('./lib/routes/shellOnly')
 };
 
 Shell.Shell = function(settings){
-    console.warn('Deprecated, use `shell()` instead of `shell.Shell()`');
-    return new Shell( settings );
+  console.warn('Deprecated, use `shell()` instead of `shell.Shell()`');
+  return new Shell( settings );
 };

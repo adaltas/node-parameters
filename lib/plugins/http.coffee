@@ -32,64 +32,64 @@ Example:
 ```javascript
 var app = new shell();
 app.configure(function() {
-    app.use(shell.router({
-        shell: app
-    }));
-    app.use(shell.http({
-        shell: app
-    }));
-    app.use(shell.help({
-        shell: app,
-        introduction: true
-    }));
+  app.use(shell.router({
+    shell: app
+  }));
+  app.use(shell.http({
+    shell: app
+  }));
+  app.use(shell.help({
+    shell: app,
+    introduction: true
+  }));
 });
 ```
 
 ###
 module.exports = () ->
-    settings = {}
-    cmd = () ->
-        searchs = if settings.path then [settings.path] else ['app', 'server', 'lib/app', 'lib/server']
-        for search in searchs
-            search = path.resolve settings.workspace, search
-            if existsSync "#{search}"
-                if search.substr(-4) is '.coffee'
-                then return "coffee #{search}"
-                else return "node #{search}"
-            if existsSync "#{search}.js"
-                return "node #{search}.js"
-            else if existsSync "#{search}.coffee"
-                return "coffee #{search}.coffee"
-        throw new Error 'Failed to discover a "server.js" or "app.js" file'
-    http = null
-    # Register commands
-    route = (req, res, next) ->
-        app = req.shell
-        # Caching
-        return next() if app.tmp.http
-        app.tmp.http = true
-        # Workspace settings
-        settings.workspace ?= app.set 'workspace'
-        throw new Error 'No workspace provided' if not settings.workspace
-        # Messages
-        settings.message_start ?= 'HTTP server successfully started'
-        settings.message_stop ?= 'HTTP server successfully stopped'
-        settings.cmd = cmd() unless settings.cmd
-        app.cmd 'http start', 'Start HTTP server', (req, res, next) ->
-            http = start_stop.start settings, (err, pid) ->
-                return next err if err
-                return res.cyan('HTTP server already started').ln() and res.prompt() unless pid
-                res.cyan(settings.message_start).ln()
-                res.prompt()
-        app.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->
-            start_stop.stop settings, (err, success) ->
-                if success
-                then res.cyan(settings.message_stop).ln()
-                else res.magenta('HTTP server was not started').ln()
-                res.prompt()
-        next()
-    if arguments.length is 1
-        settings = arguments[0]
-        return route
-    else
-        route.apply null, arguments
+  settings = {}
+  cmd = () ->
+    searchs = if settings.path then [settings.path] else ['app', 'server', 'lib/app', 'lib/server']
+    for search in searchs
+      search = path.resolve settings.workspace, search
+      if existsSync "#{search}"
+        if search.substr(-4) is '.coffee'
+        then return "coffee #{search}"
+        else return "node #{search}"
+      if existsSync "#{search}.js"
+        return "node #{search}.js"
+      else if existsSync "#{search}.coffee"
+        return "coffee #{search}.coffee"
+    throw new Error 'Failed to discover a "server.js" or "app.js" file'
+  http = null
+  # Register commands
+  route = (req, res, next) ->
+    app = req.shell
+    # Caching
+    return next() if app.tmp.http
+    app.tmp.http = true
+    # Workspace settings
+    settings.workspace ?= app.set 'workspace'
+    throw new Error 'No workspace provided' if not settings.workspace
+    # Messages
+    settings.message_start ?= 'HTTP server successfully started'
+    settings.message_stop ?= 'HTTP server successfully stopped'
+    settings.cmd = cmd() unless settings.cmd
+    app.cmd 'http start', 'Start HTTP server', (req, res, next) ->
+      http = start_stop.start settings, (err, pid) ->
+        return next err if err
+        return res.cyan('HTTP server already started').ln() and res.prompt() unless pid
+        res.cyan(settings.message_start).ln()
+        res.prompt()
+    app.cmd 'http stop', 'Stop HTTP server', (req, res, next) ->
+      start_stop.stop settings, (err, success) ->
+        if success
+        then res.cyan(settings.message_stop).ln()
+        else res.magenta('HTTP server was not started').ln()
+        res.prompt()
+    next()
+  if arguments.length is 1
+    settings = arguments[0]
+    return route
+  else
+    route.apply null, arguments
