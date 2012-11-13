@@ -5,7 +5,10 @@ List of API changes and enhancements
 Version 0.2.9
 -------------
 
+Make it a better citizen
+Generate JS code
 Rename `attach` option to `detached` in start_stop
+Restart on file change in start_stop
 
 Version 0.2.8
 -------------
