@@ -1,6 +1,7 @@
 
 should = require 'should'
-shell = require '..'
+shell = if process.env.SHELL_COV then require '../lib-cov/Shell' else require '../lib/Shell'
+NullStream = if process.env.SHELL_COV then require '../lib-cov/NullStream' else require '../lib/NullStream'
 
 describe 'Shell', ->
   ###
@@ -11,14 +12,14 @@ describe 'Shell', ->
   it 'should construct with new call', ->
     app = new shell
       command: ''
-      stdin: new shell.NullStream
-      stdout: new shell.NullStream
+      stdin: new NullStream
+      stdout: new NullStream
     app.should.be.an.instanceof shell
     app.quit()
   it 'should construct with function call', ->
     app = shell
       command: ''
-      stdin: new shell.NullStream
-      stdout: new shell.NullStream
+      stdin: new NullStream
+      stdout: new NullStream
     app.should.be.an.instanceof shell
     app.quit()

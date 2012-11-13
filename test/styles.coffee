@@ -1,7 +1,7 @@
 
 should = require 'should'
-shell = require '..'
-styles = shell.styles
+shell = if process.env.SHELL_COV then require '../lib-cov/Shell' else require '../lib/Shell'
+styles = if process.env.SHELL_COV then require '../lib-cov/Styles' else require '../lib/Styles'
 
 class Writer
   data: ''

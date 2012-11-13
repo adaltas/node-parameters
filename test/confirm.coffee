@@ -1,12 +1,14 @@
 
 should = require 'should'
-shell = require '..'
-styles = require '../lib/styles'
+shell = if process.env.SHELL_COV then require '../lib-cov/Shell' else require '../lib/Shell'
+NullStream = if process.env.SHELL_COV then require '../lib-cov/NullStream' else require '../lib/NullStream'
+router = if process.env.SHELL_COV then require '../lib-cov/plugins/router' else require '../lib/plugins/router'
+styles = if process.env.SHELL_COV then require '../lib-cov/styles' else require '../src/styles'
 
 describe 'req confirm', ->
   it 'should provide a boolean', (next) ->
-    stdin = new shell.NullStream
-    stdout = new shell.NullStream
+    stdin = new NullStream
+    stdout = new NullStream
     stdout.on 'data', (data) ->
       return unless data.trim()
       styles.unstyle(data).should.eql 'Do u confirm? [Yn] '
@@ -18,7 +20,7 @@ describe 'req confirm', ->
       stdin: stdin
       stdout: stdout
     app.configure ->
-      app.use shell.router shell: app
+      app.use router shell: app
     app.cmd 'test string', (req, res) ->
       req.confirm 'Do u confirm?', (value) ->
         value.should.eql true

@@ -1,11 +1,13 @@
 
 should = require 'should'
-shell = require '..'
+shell = if process.env.SHELL_COV then require '../lib-cov/Shell' else require '../lib/Shell'
+NullStream = if process.env.SHELL_COV then require '../lib-cov/NullStream' else require '../lib/NullStream'
+router = if process.env.SHELL_COV then require '../lib-cov/plugins/router' else require '../lib/plugins/router'
 
 describe 'Request question', ->
   it 'Question # req # string', (next) ->
-    stdin = new shell.NullStream
-    stdout = new shell.NullStream
+    stdin = new NullStream
+    stdout = new NullStream
     stdout.on 'data', (data) ->
       return unless data.trim()
       data.should.eql 'My question: '
@@ -16,15 +18,15 @@ describe 'Request question', ->
       stdin: stdin
       stdout: stdout
     app.configure ->
-      app.use shell.router shell: app
+      app.use router shell: app
     app.cmd 'test string', (req, res) ->
       req.question 'My question:', (value) ->
         value.should.eql 'My answer'
         next()
   it 'Question # req # array of objects', (next) ->
     expects = ['Question 1 ', 'Question 2 [v 2] ']
-    stdin = new shell.NullStream
-    stdout = new shell.NullStream
+    stdin = new NullStream
+    stdout = new NullStream
     stdout.on 'data', (data) ->
       return unless data.trim()
       data.should.eql expects.shift()
@@ -35,7 +37,7 @@ describe 'Request question', ->
       stdin: stdin
       stdout: stdout
     app.configure ->
-      app.use shell.router shell: app
+      app.use router shell: app
     app.cmd 'test array', (req, res) ->
       req.question [
         name: 'Question 1'
@@ -49,8 +51,8 @@ describe 'Request question', ->
         next()
   it 'Question # req # object', (next) ->
     expects = ['Question 1 ', 'Question 2 [v 2] ', 'Question 3 [v 3] ']
-    stdin = new shell.NullStream
-    stdout = new shell.NullStream
+    stdin = new NullStream
+    stdout = new NullStream
     stdout.on 'data', (data) ->
       return unless data.trim()
       data.should.eql expects.shift()
@@ -61,7 +63,7 @@ describe 'Request question', ->
       stdin: stdin
       stdout: stdout
     app.configure ->
-      app.use shell.router shell: app
+      app.use router shell: app
     app.cmd 'test object', (req, res) ->
       req.question
         'Question 1': null
