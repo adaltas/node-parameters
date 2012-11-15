@@ -2,6 +2,7 @@
   "name": "shell",
   "version": "0.2.9",
   "description": "Full features and pretty console applications",
+  "homepage": "http://localhost:4000/projects/node-shell",
   "author": "David Worms <david@adaltas.com>",
   "contributors": [{
     "name": "David Worms",
