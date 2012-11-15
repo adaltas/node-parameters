@@ -17,12 +17,12 @@
     "node": ">= 0.6.0"
   },
   "dependencies": {
-    "coffee-script": "latest",
     "each": "latest",
     "pad": "latest",
     "optimist": "latest"
   },
   "devDependencies": {
+    "coffee-script": "latest",
     "mocha": "latest",
     "should": "latest"
   },

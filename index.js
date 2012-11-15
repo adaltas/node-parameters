@@ -1,4 +1,3 @@
-require('coffee-script');
 
 // Core
 var Shell = module.exports = require('./lib/Shell');
