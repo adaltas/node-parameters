@@ -2,6 +2,11 @@
 List of API changes and enhancements
 ====================================
 
+Version 0.2.10
+--------------
+
+Move coffee as a dev dependency
+
 Version 0.2.9
 -------------
 
