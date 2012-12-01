@@ -22,7 +22,7 @@ module.exports = class Request
       multiple = false
       questions = [{name: questions, value: ''}]
     each(questions)
-    .on 'item', (next, question) =>
+    .on 'item', (question, next) =>
       q = "#{question.name} "
       q += "[#{question.value}] " if question.value
       @shell.interface().question q, (answer) ->

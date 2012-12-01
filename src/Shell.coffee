@@ -3,7 +3,6 @@ util = require 'util'
 readline = require 'readline'
 events = require 'events'
 EventEmitter = events.EventEmitter
-each = require 'each'
 utils = require './utils'
 styles = require './Styles'
 Request = require './Request'
