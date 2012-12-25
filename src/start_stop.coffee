@@ -74,7 +74,6 @@ module.exports = start_stop =
         ignore = require 'fstream-ignore'
         ignore(ioptions)
         .on 'child', (c) ->
-          console.log c.path 
           # c.on 'ignoreFile', (path, content) ->
           #   console.log 'ignore', path, content.toString()
           fs.watchFile c.path, (curr, prev) ->
