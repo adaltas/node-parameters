@@ -1,6 +1,6 @@
 {
   "name": "shell",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Full features and pretty console applications",
   "homepage": "http://www.adaltas.com/projects/node-shell",
   "author": "David Worms <david@adaltas.com>",
