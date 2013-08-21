@@ -92,10 +92,10 @@ The constructor `shell` takes an optional object. Options are:
 -   `prompt`     , Character for command prompt, Defaults to ">>"
 -   `stdin`      , Source to read from
 -   `stdout`     , Destination to write to
--   `env`        , Running environment, Defaults to the `env` setting (or `NODE_ENV` if defined, eg: `production`, `develepment`).
--   `isShell`    , Detect whether the command is runned inside a shell are as a single command.
--   `noPrompt`   , Do not prompt the user for a command, usefull to plug your own starting mechanisme (eg: starting with a question).
--   `workspace`  , Project root directory or null if none was found. The discovery strategy start from the current working directory and traverse each parent dir looking for a `node_module` directory or a `package.json` file.
+-   `env`        , Running environment, Defaults to the `env` setting (or `NODE_ENV` if defined, eg: `production`, `development`).
+-   `isShell`    , Detect whether the command is run inside a shell or as a single command.
+-   `noPrompt`   , Do not prompt the user for a command, useful to plug your own starting mechanism (eg: starting with a question).
+-   `workspace`  , Project root directory or null if none was found. The discovery strategy starts from the current working directory and traverses each parent dir looking for a `node_module` directory or a `package.json` file.
 
 Shell settings may be set by calling `app.set('key', value)`.  They can be retrieved by calling the same function without a second argument.
 
