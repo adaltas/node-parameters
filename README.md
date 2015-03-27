@@ -5,7 +5,7 @@ similar functionality to console based applications.
 
 * Run both in shell mode and command mode
 * First class citizen for console application (arrows, ctrl-a, ctrl-u,...)
-* User friendly with history, help messages and many other plugings
+* User friendly with history, help messages and many other plugins
 * Foundation to structure and build complex based applications
 * Command matching, parameters and advanced functionnalities found in Express routing
 * Flexible architecture based on middlewares for plugin creation and routing enhancement
@@ -116,7 +116,7 @@ If `app.configure` is called without specifying the environment as the first arg
 Middlewares and plugins
 -----------------------
 
-Shell is build on a middleware architecture. When a command is issued, multiple callbacks are executed sequentially until one decide to stop the process  (calling `res.prompt()` or `shell.quit`. Those callbacks are called middlewares. A callback recieve 3 arguments: a `request` object, a `response` object and the next callback. Traditionnaly, `request` deals with `stdin` while `response` deals with `stdout`.
+Shell is build on a middleware architecture. When a command is issued, multiple callbacks are executed sequentially until one decide to stop the process  (calling `res.prompt()` or `shell.quit`. Those callbacks are called middlewares. A callback recieves 3 arguments: a `request` object, a `response` object and the next callback. Traditionnaly, `request` deals with `stdin` while `response` deals with `stdout`.
 
 A plugin is simply a function which configure and return a middleware. Same plugin also enrich the Shell application with new routes and functions.
 
@@ -139,7 +139,7 @@ The request object contains the following properties:
 -   `shell`   , (required) A reference to your shell application.
 -   `command` , Command entered by the user
 -   `params`  , Parameters object extracted from the command, defined by the `shell.router` middleware
--   `qestion` , Ask questions with optionally suggested and default answers
+-   `question` , Ask questions with optionally suggested and default answers
 -   `confirm` , Ask a question expecting a boolean answer
 
 Response parameter
