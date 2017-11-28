@@ -1,7 +1,9 @@
 
 # List of API changes and enhancements
 
-## Version 0.4.0
+## Trunk
+
+Breaking changes: the version requires Node.js version 8 and above.
 
 * package: remove cov
 * package: latest coffee and mocha
