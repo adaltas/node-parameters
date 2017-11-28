@@ -1,7 +1,7 @@
 
 # List of API changes and enhancements
 
-## Trunk
+## Version 0.4.0
 
 * package: remove cov
 * package: latest coffee and mocha

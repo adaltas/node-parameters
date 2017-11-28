@@ -1,6 +1,6 @@
 {
   "name": "shell",
-  "version": "0.3.2",
+  "version": "0.4.0",
   "description": "Full features and pretty console applications",
   "homepage": "https://github.com/adaltas/node-shell",
   "license": "BSD-3-Clause",
