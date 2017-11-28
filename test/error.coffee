@@ -1,9 +1,9 @@
 
 should = require 'should'
-shell = if process.env.SHELL_COV then require '../lib-cov/Shell' else require '../lib/Shell'
-NullStream = if process.env.SHELL_COV then require '../lib-cov/NullStream' else require '../lib/NullStream'
-router = if process.env.SHELL_COV then require '../lib-cov/plugins/router' else require '../lib/plugins/router'
-error = if process.env.SHELL_COV then require '../lib-cov/plugins/error' else require '../lib/plugins/error'
+shell = require '../lib/Shell'
+NullStream = require '../lib/NullStream'
+router = require '../lib/plugins/router'
+error =  require '../lib/plugins/error'
 
 describe 'plugin error', ->
   it 'should print a thrown error', (next) ->

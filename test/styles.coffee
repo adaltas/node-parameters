@@ -1,7 +1,7 @@
 
 should = require 'should'
-shell = if process.env.SHELL_COV then require '../lib-cov/Shell' else require '../lib/Shell'
-styles = if process.env.SHELL_COV then require '../lib-cov/Styles' else require '../lib/Styles'
+shell = require '../lib/Shell'
+styles = require '../lib/Styles'
 
 class Writer
   data: ''
@@ -38,4 +38,3 @@ describe 'Styles', ->
     .print('Test ').green().print('gre').print('en').nocolor(' or ').blue().print('bl').print('ue').nocolor(' and ').green().print('gre').print('en').ln()
     .reset()
     writer.data.should.eql '\u001b[39m\u001b[22mTest \u001b[39m\u001b[22m\u001b[32m\u001b[22m\u001b[32m\u001b[22mgre\u001b[32m\u001b[22m\u001b[32m\u001b[22m\u001b[32m\u001b[22men\u001b[32m\u001b[22m\u001b[32m\u001b[22m\u001b[39m\u001b[22m or \u001b[32m\u001b[22m\u001b[32m\u001b[22m\u001b[34m\u001b[22m\u001b[34m\u001b[22mbl\u001b[34m\u001b[22m\u001b[34m\u001b[22m\u001b[34m\u001b[22mue\u001b[34m\u001b[22m\u001b[34m\u001b[22m\u001b[39m\u001b[22m and \u001b[34m\u001b[22m\u001b[34m\u001b[22m\u001b[32m\u001b[22m\u001b[32m\u001b[22mgre\u001b[32m\u001b[22m\u001b[32m\u001b[22m\u001b[32m\u001b[22men\u001b[32m\u001b[22m\u001b[32m\u001b[22m\n\u001b[39m\u001b[22m'
-

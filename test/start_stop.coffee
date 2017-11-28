@@ -3,7 +3,7 @@ fs = require 'fs'
 path = require 'path'
 exists = fs.exists or path.exists
 should = require 'should'
-start_stop = if process.env.SHELL_COV then require '../lib-cov/start_stop' else require '../src/start_stop'
+start_stop = require '../src/start_stop'
 
 describe 'StartStop', ->
   it 'should detach a child, start and stop', (next) ->

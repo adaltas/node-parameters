@@ -1,7 +1,7 @@
 
 should = require 'should'
-shell = if process.env.SHELL_COV then require '../lib-cov/Shell' else require '../lib/Shell'
-NullStream = if process.env.SHELL_COV then require '../lib-cov/NullStream' else require '../lib/NullStream'
+shell = require '../lib/Shell'
+NullStream = require '../lib/NullStream'
 
 describe 'Shell', ->
   ###
