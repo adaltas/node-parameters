@@ -70,7 +70,6 @@ module.exports = start_stop =
         ioptions =
           path: options.watch
           ignoreFiles: [".startstopignore"] or options.watchIgnoreFiles
-        console.log 'ioptions', ioptions
         ignore = require 'fstream-ignore'
         ignore(ioptions)
         .on 'child', (c) ->
@@ -246,9 +245,9 @@ module.exports = start_stop =
       console.log 'Option attach was renamed to detached to be consistent with the spawn API'
       options.detached = not options.attach
     return callback null, null, false unless options.detached
+    dir = path.resolve process.env['HOME'], '.node_shell'
     start = ->
       return pidFileExists() if options.pidfile
-      dir = path.resolve process.env['HOME'], '.node_shell'
       file = md5 options.cmd
       options.pidfile = "#{dir}/#{file}.pid"
       exists dir, (dirExists) ->
@@ -278,8 +277,6 @@ module.exports = start_stop =
 
   ###
   running: (pid, callback) ->
-    exec "ps -ef #{pid} | grep -v PID", (err, stdout, stderr) ->
+    exec "kill -0 #{pid}", (err, stdout, stderr) ->
       return callback err if err and err.code isnt 1
       callback null, not err
-
-

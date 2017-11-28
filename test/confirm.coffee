@@ -1,9 +1,9 @@
 
 should = require 'should'
-shell = if process.env.SHELL_COV then require '../lib-cov/Shell' else require '../lib/Shell'
-NullStream = if process.env.SHELL_COV then require '../lib-cov/NullStream' else require '../lib/NullStream'
-router = if process.env.SHELL_COV then require '../lib-cov/plugins/router' else require '../lib/plugins/router'
-styles = if process.env.SHELL_COV then require '../lib-cov/styles' else require '../src/styles'
+shell = if process.env.SHELL_COV then require '../lib-cov/Shell' else require '../src/Shell'
+NullStream = if process.env.SHELL_COV then require '../lib-cov/NullStream' else require '../src/NullStream'
+router = if process.env.SHELL_COV then require '../lib-cov/plugins/router' else require '../src/plugins/router'
+styles = if process.env.SHELL_COV then require '../lib-cov/styles' else require '../src/Styles'
 
 describe 'req confirm', ->
   it 'should provide a boolean', (next) ->

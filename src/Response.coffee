@@ -4,8 +4,8 @@ pad = require 'pad'
 
 module.exports = class Response extends styles
   constructor: (settings) ->
-    @shell = settings.shell
     super settings
+    @shell = settings.shell
   pad: pad
   prompt: ->
     @shell.prompt()

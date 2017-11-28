@@ -3,7 +3,7 @@ fs = require 'fs'
 path = require 'path'
 exists = fs.exists or path.exists
 should = require 'should'
-start_stop = if process.env.SHELL_COV then require '../lib-cov/start_stop' else require '../lib/start_stop'
+start_stop = if process.env.SHELL_COV then require '../lib-cov/start_stop' else require '../src/start_stop'
 
 describe 'StartStop', ->
   it 'should detach a child, start and stop', (next) ->
@@ -11,7 +11,7 @@ describe 'StartStop', ->
     # Start the process
     start_stop.start cmd: cmd, detached: true, (err, pid) ->
       should.not.exist err
-      pid.should.be.a 'number'
+      pid.should.be.a.Number()
       # Check if process started
       start_stop.running pid, (err, running) ->
         should.not.exist err
@@ -22,14 +22,14 @@ describe 'StartStop', ->
           # Check if process stoped
           start_stop.running pid, (err, running) ->
             should.not.exist err
-            running.should.be.false
+            running.should.be.False()
             next()
   it 'should detach a child and stop inactive process', (next) ->
     cmd = "node #{__dirname}/start_stop/server.js"
     # Stop process
     start_stop.stop cmd:cmd, detached: true, (err, stoped) ->
       should.not.exist err
-      stoped.should.be.false
+      stoped.should.be.False()
       next()
   it 'should detach a child and stop inactive process with pidfile', (next) ->
     cmd = "node #{__dirname}/start_stop/server.js"
@@ -38,14 +38,14 @@ describe 'StartStop', ->
       # Check process doesnt exists
       start_stop.running 1234567, (err, running) ->
         should.not.exist err
-        running.should.be.false
+        running.should.be.False()
         # Stop process
         start_stop.stop cmd:cmd, pidfile: pidfile, detached: true, (err, stoped) ->
           should.not.exist err
-          stoped.should.be.false
+          stoped.should.be.False()
           # Pidfile shall be removed even if pid is invalid
           exists pidfile, (running) ->
-            running.should.be.false
+            running.should.be.False()
             next()
   it 'should detach a child and honor the strict option', (next) ->
     # From the API
@@ -58,13 +58,13 @@ describe 'StartStop', ->
       # Check process doesnt exists
       start_stop.running 1234567, (err, running) ->
         should.not.exist err
-        running.should.be.false
+        running.should.be.False()
         # Stop process
         start_stop.stop cmd:cmd, pidfile: pidfile, strict: true, detached: true, (err, stoped) ->
           err.should.be.an.instanceof Error
           # Pidfile shall be removed even if pid is invalid
           exists pidfile, (running) ->
-            running.should.be.false
+            running.should.be.False()
             next()
   it 'should detach a child and throw an error if pidfile not in directory', (next) ->
     cmd = "node #{__dirname}/start_stop/server.js"
@@ -78,7 +78,7 @@ describe 'StartStop', ->
     # Start the process
     start_stop.start cmd: cmd, detached: false, (err, pid) ->
       should.not.exist err
-      pid.should.be.a 'number'
+      pid.should.be.a.Number()
       # Check if process started
       start_stop.running pid, (err, running) ->
         should.not.exist err
@@ -89,7 +89,7 @@ describe 'StartStop', ->
           # Check if process stoped
           start_stop.running pid, (err, running) ->
             should.not.exist err
-            running.should.be.false
+            running.should.be.False()
             next()
   # it 'should detach a child and restart on change', (next) ->
   #   cmd = "node #{__dirname}/start_stop/server.js"
@@ -106,8 +106,5 @@ describe 'StartStop', ->
   #         # Check if process stoped
   #         start_stop.running pid, (err, running) ->
   #           should.not.exist err
-  #           running.should.be.false
+  #           running.should.be.False()
   #           next()
-
-
-

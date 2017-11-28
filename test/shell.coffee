@@ -14,12 +14,12 @@ describe 'Shell', ->
       command: ''
       stdin: new NullStream
       stdout: new NullStream
-    app.should.be.an.instanceof shell
+    app.should.be.an.instanceof shell.Shell
     app.quit()
   it 'should construct with function call', ->
     app = shell
       command: ''
       stdin: new NullStream
       stdout: new NullStream
-    app.should.be.an.instanceof shell
+    app.should.be.an.instanceof shell.Shell
     app.quit()
