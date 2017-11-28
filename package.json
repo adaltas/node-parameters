@@ -2,7 +2,8 @@
   "name": "shell",
   "version": "0.3.2",
   "description": "Full features and pretty console applications",
-  "homepage": "http://www.adaltas.com/projects/node-shell",
+  "homepage": "https://github.com/adaltas/node-shell",
+  "license": "BSD-3-Clause",
   "author": "David Worms <david@adaltas.com>",
   "contributors": [{
     "name": "David Worms",
@@ -30,7 +31,7 @@
   "keywords": ["cli", "console", "colors", "xterm", "args", "argument"],
   "repository": {
     "type": "git",
-    "url": "https://github.com/wdavidw/node-shell.git"
+    "url": "https://github.com/adaltas/node-shell.git"
   },
   "scripts": {
     "test": "make test"
