@@ -1,7 +1,7 @@
 
 # List of API changes and enhancements
 
-## Trunk
+## Version 0.5.0
 
 Breaking changes: the version requires Node.js version 8 and above.
 
