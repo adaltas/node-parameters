@@ -5,35 +5,58 @@
   "homepage": "https://github.com/adaltas/node-shell",
   "license": "BSD-3-Clause",
   "author": "David Worms <david@adaltas.com>",
-  "contributors": [{
-    "name": "David Worms",
-    "email": "david@adaltas.com"
-  },{
-    "name": "Tony",
-    "email": "https://github.com/Zearin"
-  },{
-    "name": "Russ Frank",
-    "email": "https://github.com/russfrank"
-  }],
+  "contributors": [
+    {
+      "name": "David Worms",
+      "email": "david@adaltas.com"
+    },
+    {
+      "name": "Tony",
+      "email": "https://github.com/Zearin"
+    },
+    {
+      "name": "Russ Frank",
+      "email": "https://github.com/russfrank"
+    }
+  ],
   "engines": {
     "node": ">= 0.6.0"
   },
   "dependencies": {
     "each": "latest",
-    "pad": "latest",
-    "optimist": "latest"
+    "express": "^4.16.2",
+    "optimist": "latest",
+    "pad": "latest"
+  },
+  "optionDependency": {
+    "express": "4.16.2"
   },
   "devDependencies": {
-    "coffee-script": "latest",
+    "coffeescript": "^2.0.3",
     "mocha": "latest",
     "should": "latest"
   },
-  "keywords": ["cli", "console", "colors", "xterm", "args", "argument"],
+  "keywords": [
+    "cli",
+    "console",
+    "colors",
+    "xterm",
+    "args",
+    "argument"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/adaltas/node-shell.git"
   },
   "scripts": {
-    "test": "make test"
+    "preversion": "grep '## Trunk' CHANGELOG.md && npm test",
+    "version": "version=`grep '^  \"version\": ' package.json | sed 's/.*\"\\([0-9\\.]*\\)\".*/\\1/'` && sed -i \"s/## Trunk/## Version $version/\" CHANGELOG.md && git add CHANGELOG.md",
+    "postversion": "git push && git push --tags && npm publish",
+    "patch": "npm version patch -m 'Bump to version %s'",
+    "minor": "npm version minor -m 'Bump to version %s'",
+    "major": "npm version major -m 'Bump to version %s'",
+    "coffee": "./node_modules/.bin/coffee -b -o lib src",
+    "pretest": "./node_modules/.bin/coffee -b -o lib src",
+    "test": "./node_modules/.bin/mocha test/**.coffee"
   }
 }

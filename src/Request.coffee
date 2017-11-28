@@ -22,7 +22,7 @@ module.exports = class Request
       multiple = false
       questions = [{name: questions, value: ''}]
     each(questions)
-    .on 'item', (question, next) =>
+    .call (question, next) =>
       q = "#{question.name} "
       q += "[#{question.value}] " if question.value
       @shell.interface().question q, (answer) ->
@@ -30,7 +30,7 @@ module.exports = class Request
         answers[question.name] = 
           if answer is '' then question.value else answer
         next()
-    .on 'end', ->
+    .next ->
       answers = answers[questions[0].name] unless multiple
       return callback answers
   ###

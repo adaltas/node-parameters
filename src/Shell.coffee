@@ -17,10 +17,13 @@ Interface.prototype.setPrompt = ( (parent) ->
     parent.apply @, args
 )( Interface.prototype.setPrompt )
 
-module.exports = class Shell extends EventEmitter
+module.exports = (settings) ->
+  new Shell settings
+
+class Shell extends EventEmitter
   constructor: (settings = {}) ->
-    return new Shell(settings) if @ not instanceof Shell
-    EventEmitter.call @
+    super settings
+    # EventEmitter.call @
     @tmp = {}
     @settings = settings
     @settings.prompt ?= '>> '
@@ -150,3 +153,6 @@ module.exports = class Shell extends EventEmitter
     @interface().close()
     @settings.stdin.destroy()
     #@set 'stdin', null
+
+
+module.exports.Shell = Shell
