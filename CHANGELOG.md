@@ -3,6 +3,7 @@
 
 ## Trunk
 
+* package: remove cov
 * package: latest coffee and mocha
 * package: change project url
 
