@@ -41,7 +41,7 @@ module.exports = (settings) ->
   Interface.prototype._addHistory = ((parent) -> ->
     if @history.length
       buffer = new Buffer JSON.stringify( @history )
-      fs.write stream.fd, buffer, 0, buffer.length, 0
+      fs.writeSync stream.fd, buffer, 0, buffer.length, 0
     parent.apply @, arguments
   ) Interface.prototype._addHistory
   null
