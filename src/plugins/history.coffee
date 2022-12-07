@@ -40,7 +40,7 @@ module.exports = (settings) ->
   stream = fs.createWriteStream file, {flag: 'w'}
   Interface.prototype._addHistory = ((parent) -> ->
     if @history.length
-      buffer = new Buffer JSON.stringify( @history )
+      buffer = Buffer.from JSON.stringify( @history ), 'utf8'
       fs.writeSync stream.fd, buffer, 0, buffer.length, 0
     parent.apply @, arguments
   ) Interface.prototype._addHistory
