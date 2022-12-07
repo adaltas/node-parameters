@@ -1,4 +1,6 @@
 .*
+yarn.lock
+package-lock.json
 node_modules
 samples/http/db/*
 samples/http/logs/*
