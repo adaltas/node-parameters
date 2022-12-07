@@ -1,7 +1,7 @@
 
 # List of API changes and enhancements
 
-## Trunk
+## Version 0.5.1
 
 * fix: use Buffer.from
 * fix: validate parent dir before start
