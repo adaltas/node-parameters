@@ -71,10 +71,14 @@ describe 'StartStop', ->
     pidfile = "#{__dirname}/doesnotexist/pidfile"
     start_stop.start cmd:cmd, pidfile: pidfile, detached: true, (err, stoped) ->
       err.should.be.an.instanceof Error
-      err.message.should.eql 'Pid directory does not exist'
+      err.message.should.eql "Pid directory does not exist: #{__dirname}/doesnotexist."
       next()
   it 'should attach a child', (next) ->
     cmd = "node #{__dirname}/start_stop/server.js"
+    # NOTE: the test fail on stop with error "Unexpected exit code 1"
+    # when a test process is already running and binding the server port
+    # An error should have been thrown in `start` instead of `stop`
+    # since the process was never started.
     # Start the process
     start_stop.start cmd: cmd, detached: false, (err, pid) ->
       should.not.exist err

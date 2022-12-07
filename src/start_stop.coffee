@@ -91,18 +91,19 @@ module.exports = start_stop =
         start()
       # Start the process
       start = ->
-        pipe = "</dev/null >#{cmdStdout} 2>#{cmdStdout}"
-        info = 'echo $? $!'
-        cmd = "#{options.cmd} #{pipe} & #{info}"
-        child = exec cmd, options, (err, stdout, stderr) ->
-          [code, pid] = stdout.split(' ')
-          code = parseInt code, 10
-          pid = parseInt pid, 10
-          if code isnt 0
-            msg = "Process exit with code #{code}"
-            return callback new Error msg
-          exists path.dirname(options.pidfile), (exists) ->
-            return callback new Error "Pid directory does not exist" unless exists
+        piddir = path.dirname(options.pidfile)
+        exists piddir, (exists) ->
+          return callback new Error "Pid directory does not exist: #{piddir}." unless exists
+          pipe = "</dev/null >#{cmdStdout} 2>#{cmdStdout}"
+          info = 'echo $? $!'
+          cmd = "#{options.cmd} #{pipe} & #{info}"
+          child = exec cmd, options, (err, stdout, stderr) ->
+            [code, pid] = stdout.split(' ')
+            code = parseInt code, 10
+            pid = parseInt pid, 10
+            if code isnt 0
+              msg = "Process exit with code #{code}"
+              return callback new Error msg
             fs.writeFile options.pidfile, '' + pid, (err) ->
               callback null, pid
       # Do the job
