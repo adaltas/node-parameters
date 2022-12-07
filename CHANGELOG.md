@@ -1,6 +1,11 @@
 
 # List of API changes and enhancements
 
+## Trunk
+
+* fix: use Buffer.from
+* fix: validate parent dir before start
+
 ## Version 0.5.0
 
 Breaking changes: the version requires Node.js version 8 and above.

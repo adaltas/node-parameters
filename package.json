@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "each": "latest",
-    "express": "^4.16.2",
+    "express": "^4.18.2",
     "optimist": "latest",
     "pad": "latest"
   },
@@ -32,7 +32,7 @@
     "express": "4.16.2"
   },
   "devDependencies": {
-    "coffeescript": "^2.0.3",
+    "coffeescript": "^2.7.0",
     "mocha": "latest",
     "should": "latest"
   },
