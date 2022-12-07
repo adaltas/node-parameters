@@ -44,6 +44,17 @@
     "args",
     "argument"
   ],
+  "mocha": {
+    "throw-deprecation": true,
+    "require": [
+      "should",
+      "coffeescript/register"
+    ],
+    "inline-diffs": true,
+    "timeout": 40000,
+    "reporter": "spec",
+    "recursive": true
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/adaltas/node-shell.git"
